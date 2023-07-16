@@ -848,7 +848,7 @@ function sample(e) {
 
 ## Other samples
 
-You can see it on [my Medium page](https://medium.com/@tanaike).
+You can see it on [my Medium page](https://medium.com/google-cloud/easily-managing-time-driven-triggers-using-google-apps-script-7fa48546b4e7).
 
 # Note
 

@@ -880,6 +880,28 @@ You can see it on [my Medium page](https://medium.com/google-cloud/easily-managi
 
   - When "wrappedSamples" is set as the time-driven trigger, 3 functions are run in order.
 
+
+### Workarounds
+- In this library, when `toDay` is not set, the trigger cycle is repeated to infinity. But, when you confirm `message: '"sample" is not installed as the time-driven trigger. Because there is no the next trigger task.'` in the log, when you run `sample` (main function), please use the following workaround. In this workaround, `toDay` is set for every run from the execution date time. By this, the trigger cycle can be continued to be run.
+
+	```json
+	function sample(e) {
+	  const toDay = new Date();
+	  toDay.setMonth(toDay.getMonth() + 1);
+	  const obj = [
+	    {
+	      ownFunctionName: "sample",
+	      functionName: "sampleFunction",
+	      everyDay: true,
+	      atTimes: ["09:00:00"],
+	      toDay: toDay.toISOString()
+	    },
+	  ];
+	  const res = TriggerApp.setEventObject(e).setMaxOutputForSimulation(5).installTriggers(obj, console.log);
+	  console.log(res);
+	}
+	```
+
 ---
 
 <a name="licence"></a>

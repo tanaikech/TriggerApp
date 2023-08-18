@@ -436,6 +436,11 @@ class TriggerApp {
         if (!this.eventObj && this.nowTime > toDayTime) {
           throw new Error("'toDay' is smaller than current date.");
         }
+      } else {
+        const toDayObj = new Date("2100-01-01T00:00:00");
+        const toDayTime = toDayObj.getTime();
+        obj.toDayObj = toDayObj;
+        obj.toDayTime = toDayTime;
       }
       if (fromDay) {
         const fromDayObj = new Date(fromDay);

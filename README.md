@@ -902,6 +902,8 @@ You can see it on [my Medium page](https://medium.com/google-cloud/easily-managi
 	}
 	```
 
+	- At V1.0.1, I think that this bug was removed.
+
 ---
 
 <a name="licence"></a>
@@ -925,5 +927,9 @@ You can see it on [my Medium page](https://medium.com/google-cloud/easily-managi
 - v1.0.0 (July 16, 2023)
 
   1. Initial release.
+
+- v1.0.1 (August 18, 2023)
+
+  1. When `toDay` is not used, there was a case that the next trigger is not installed. This bug was removed.
 
 [TOP](#top)

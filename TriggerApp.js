@@ -185,6 +185,9 @@ class TriggerApp {
     const nowTime = now.getTime();
     const nowFixed = new Date();
     const nowTimeFixed = nowFixed.getTime();
+    this.infiniteDateObj = new Date();
+    this.infiniteDateObj.setFullYear(this.infiniteDateObj.getFullYear() + 100);
+    this.infiniteDateTime = this.infiniteDateObj.getTime();
     const defaultValues = {
       now,
       nowTime,
@@ -216,6 +219,9 @@ class TriggerApp {
     const { triggerDateTimeObject, message } = this.getTriggerDateTimeObject_(object, callback, type);
     if (triggerDateTimeObject && !message) {
       const { obj, triggerDateTime } = triggerDateTimeObject;
+      // console.log(obj)
+      // throw new Error("ok");
+
       const installedTrigger1 = this.installTrigger_(obj.functionName, triggerDateTime);
       responseObj[obj.functionName] = {
         triggerDateTime,
@@ -437,10 +443,8 @@ class TriggerApp {
           throw new Error("'toDay' is smaller than current date.");
         }
       } else {
-        const toDayObj = new Date("2100-01-01T00:00:00");
-        const toDayTime = toDayObj.getTime();
-        obj.toDayObj = toDayObj;
-        obj.toDayTime = toDayTime;
+        obj.toDayObj = this.infiniteDateObj;
+        obj.toDayTime = this.infiniteDateTime;
       }
       if (fromDay) {
         const fromDayObj = new Date(fromDay);

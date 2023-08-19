@@ -932,4 +932,8 @@ You can see it on [my Medium page](https://medium.com/google-cloud/easily-managi
 
   1. When `toDay` is not used, there was a case that the next trigger is not installed. This bug was removed.
 
+- v1.0.2 (August 19, 2023)
+
+  1. When `toDay` is not used, there was a case that the next trigger is not installed. This bug was removed by efficient modification.
+
 [TOP](#top)

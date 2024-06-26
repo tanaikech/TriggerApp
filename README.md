@@ -862,10 +862,10 @@ function sample(e) {
     },
   ];
 
-  const res = TriggerApp_test.setEventObject(e).installTriggers(obj, console.log);
+  const res = TriggerApp.setEventObject(e).installTriggers(obj, console.log);
 
   // Or, if you want to check the trigger times, please use the following script.
-  // const res = TriggerApp_test.setEventObject(e).simulateTriggers(obj, console.log);
+  // const res = TriggerApp.setEventObject(e).simulateTriggers(obj, console.log);
 
   console.log(res);
 }

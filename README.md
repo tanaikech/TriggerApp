@@ -846,6 +846,58 @@ function sample(e) {
 }
 ```
 
+<a name="scenario8"></a>
+## Scenario 8
+
+When you want to execute the function on the month-end, you can use the following sample script.
+
+```javascript
+function sample(e) {
+  const obj = [
+    {
+      ownFunctionName: "sample",
+      functionName: "sampleFunction",
+      everyMonth: [15, 0],
+      atTimes: ["09:00:00"],
+    },
+  ];
+
+  const res = TriggerApp_test.setEventObject(e).installTriggers(obj, console.log);
+
+  // Or, if you want to check the trigger times, please use the following script.
+  // const res = TriggerApp_test.setEventObject(e).simulateTriggers(obj, console.log);
+
+  console.log(res);
+}
+```
+
+Here, please use `0` for the month-end. When this script is run at June 26, 2024, the time-driven triggers will be run with the following steps.
+
+```
+[
+  {"triggerTime":"2024-06-30T00:00:00.000Z","executeFunction":"sampleFunction"},
+  {"triggerTime":"2024-07-15T00:00:00.000Z","executeFunction":"sampleFunction"},
+  {"triggerTime":"2024-07-31T00:00:00.000Z","executeFunction":"sampleFunction"},
+  {"triggerTime":"2024-08-15T00:00:00.000Z","executeFunction":"sampleFunction"},
+  {"triggerTime":"2024-08-31T00:00:00.000Z","executeFunction":"sampleFunction"},
+  {"triggerTime":"2024-09-15T00:00:00.000Z","executeFunction":"sampleFunction"},
+  {"triggerTime":"2024-09-30T00:00:00.000Z","executeFunction":"sampleFunction"},
+  {"triggerTime":"2024-10-15T00:00:00.000Z","executeFunction":"sampleFunction"},
+  {"triggerTime":"2024-10-31T00:00:00.000Z","executeFunction":"sampleFunction"},
+  {"triggerTime":"2024-11-15T00:00:00.000Z","executeFunction":"sampleFunction"},
+  {"triggerTime":"2024-11-30T00:00:00.000Z","executeFunction":"sampleFunction"},
+  {"triggerTime":"2024-12-15T00:00:00.000Z","executeFunction":"sampleFunction"},
+  {"triggerTime":"2024-12-31T00:00:00.000Z","executeFunction":"sampleFunction"},
+  {"triggerTime":"2025-01-15T00:00:00.000Z","executeFunction":"sampleFunction"},
+  {"triggerTime":"2025-01-31T00:00:00.000Z","executeFunction":"sampleFunction"},
+  {"triggerTime":"2025-02-15T00:00:00.000Z","executeFunction":"sampleFunction"},
+  {"triggerTime":"2025-02-28T00:00:00.000Z","executeFunction":"sampleFunction"},
+  {"triggerTime":"2025-03-15T00:00:00.000Z","executeFunction":"sampleFunction"},
+  {"triggerTime":"2025-03-31T00:00:00.000Z","executeFunction":"sampleFunction"},
+  {"triggerTime":"2025-04-15T00:00:00.000Z","executeFunction":"sampleFunction"}
+]
+```
+
 ## Other samples
 
 You can see it on [my Medium page](https://medium.com/google-cloud/easily-managing-time-driven-triggers-using-google-apps-script-7fa48546b4e7).
@@ -935,5 +987,10 @@ You can see it on [my Medium page](https://medium.com/google-cloud/easily-managi
 - v1.0.2 (August 19, 2023)
 
   1. When `toDay` is not used, there was a case that the next trigger is not installed. This bug was removed by efficient modification.
+
+- v1.0.3 (June 26, 2024)
+
+  1. The calculation for increasing the month was modified.
+  2. A new scenario 8 was added. In scenario 8, you can see how to use the month-end. [Ref](#scenario8)
 
 [TOP](#top)

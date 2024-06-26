@@ -219,9 +219,6 @@ class TriggerApp {
     const { triggerDateTimeObject, message } = this.getTriggerDateTimeObject_(object, callback, type);
     if (triggerDateTimeObject && !message) {
       const { obj, triggerDateTime } = triggerDateTimeObject;
-      // console.log(obj)
-      // throw new Error("ok");
-
       const installedTrigger1 = this.installTrigger_(obj.functionName, triggerDateTime);
       responseObj[obj.functionName] = {
         triggerDateTime,
@@ -536,7 +533,7 @@ class TriggerApp {
 
   pointTriggers_(obj, callback) {
     const { atTimes, everyDay, everyWeek, everyMonth, everyYear, fromDay, fromDayTime, fromDayObj } = obj;
-    this.now = this.nowFixed;
+    this.now = new Date(this.nowFixed.getTime());
     this.nowTime = this.nowTimeFixed;
     if (fromDay) {
       if (this.nowTime < fromDayTime) {
@@ -664,12 +661,23 @@ class TriggerApp {
             o[k] = t;
           }
         } else if (v !== undefined && k == "everyMonth") {
+
+          // ref: https://stackoverflow.com/a/2706169
+          function addMonths(date, months) {
+            var d = date.getDate();
+            date.setMonth(date.getMonth() + +months);
+            if (date.getDate() != d) {
+              date.setDate(0);
+            }
+            return date;
+          }
+
           const dateObj = v.flatMap(e => {
             return setTimeValues.map(tt => {
               const temp = new Date(self.nowTime);
               const td = temp.getDate();
               if (td > e) {
-                temp.setMonth(temp.getMonth() + 1);
+                addMonths(temp, 1);
               }
               temp.setDate(e);
               temp.setHours(...tt.split(":").map(f => Number(f)), 0, 0);

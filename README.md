@@ -867,7 +867,8 @@ function sample(e) {
   // Or, if you want to check the trigger times, please use the following script.
   // const res = TriggerApp.setEventObject(e).simulateTriggers(obj, console.log);
 
-  console.log(res);
+  const str = res.map(({ triggerTime, executeFunction }) => ({ triggerTime: Utilities.formatDate(triggerTime, Session.getScriptTimeZone(), "yyyy-MM-dd'T'HH:mm:ss'Z'"), executeFunction }));
+  console.log(JSON.stringify(str));
 }
 ```
 
@@ -875,26 +876,26 @@ Here, please use `0` for the month-end. When this script is run at June 26, 2024
 
 ```
 [
-  {"triggerTime":"2024-06-30T00:00:00.000Z","executeFunction":"sampleFunction"},
-  {"triggerTime":"2024-07-15T00:00:00.000Z","executeFunction":"sampleFunction"},
-  {"triggerTime":"2024-07-31T00:00:00.000Z","executeFunction":"sampleFunction"},
-  {"triggerTime":"2024-08-15T00:00:00.000Z","executeFunction":"sampleFunction"},
-  {"triggerTime":"2024-08-31T00:00:00.000Z","executeFunction":"sampleFunction"},
-  {"triggerTime":"2024-09-15T00:00:00.000Z","executeFunction":"sampleFunction"},
-  {"triggerTime":"2024-09-30T00:00:00.000Z","executeFunction":"sampleFunction"},
-  {"triggerTime":"2024-10-15T00:00:00.000Z","executeFunction":"sampleFunction"},
-  {"triggerTime":"2024-10-31T00:00:00.000Z","executeFunction":"sampleFunction"},
-  {"triggerTime":"2024-11-15T00:00:00.000Z","executeFunction":"sampleFunction"},
-  {"triggerTime":"2024-11-30T00:00:00.000Z","executeFunction":"sampleFunction"},
-  {"triggerTime":"2024-12-15T00:00:00.000Z","executeFunction":"sampleFunction"},
-  {"triggerTime":"2024-12-31T00:00:00.000Z","executeFunction":"sampleFunction"},
-  {"triggerTime":"2025-01-15T00:00:00.000Z","executeFunction":"sampleFunction"},
-  {"triggerTime":"2025-01-31T00:00:00.000Z","executeFunction":"sampleFunction"},
-  {"triggerTime":"2025-02-15T00:00:00.000Z","executeFunction":"sampleFunction"},
-  {"triggerTime":"2025-02-28T00:00:00.000Z","executeFunction":"sampleFunction"},
-  {"triggerTime":"2025-03-15T00:00:00.000Z","executeFunction":"sampleFunction"},
-  {"triggerTime":"2025-03-31T00:00:00.000Z","executeFunction":"sampleFunction"},
-  {"triggerTime":"2025-04-15T00:00:00.000Z","executeFunction":"sampleFunction"}
+  { "triggerTime": "2024-06-30T09:00:00Z", "executeFunction": "sampleFunction" },
+  { "triggerTime": "2024-07-15T09:00:00Z", "executeFunction": "sampleFunction" },
+  { "triggerTime": "2024-07-31T09:00:00Z", "executeFunction": "sampleFunction" },
+  { "triggerTime": "2024-08-15T09:00:00Z", "executeFunction": "sampleFunction" },
+  { "triggerTime": "2024-08-31T09:00:00Z", "executeFunction": "sampleFunction" },
+  { "triggerTime": "2024-09-15T09:00:00Z", "executeFunction": "sampleFunction" },
+  { "triggerTime": "2024-09-30T09:00:00Z", "executeFunction": "sampleFunction" },
+  { "triggerTime": "2024-10-15T09:00:00Z", "executeFunction": "sampleFunction" },
+  { "triggerTime": "2024-10-31T09:00:00Z", "executeFunction": "sampleFunction" },
+  { "triggerTime": "2024-11-15T09:00:00Z", "executeFunction": "sampleFunction" },
+  { "triggerTime": "2024-11-30T09:00:00Z", "executeFunction": "sampleFunction" },
+  { "triggerTime": "2024-12-15T09:00:00Z", "executeFunction": "sampleFunction" },
+  { "triggerTime": "2024-12-31T09:00:00Z", "executeFunction": "sampleFunction" },
+  { "triggerTime": "2025-01-15T09:00:00Z", "executeFunction": "sampleFunction" },
+  { "triggerTime": "2025-01-31T09:00:00Z", "executeFunction": "sampleFunction" },
+  { "triggerTime": "2025-02-15T09:00:00Z", "executeFunction": "sampleFunction" },
+  { "triggerTime": "2025-02-28T09:00:00Z", "executeFunction": "sampleFunction" },
+  { "triggerTime": "2025-03-15T09:00:00Z", "executeFunction": "sampleFunction" },
+  { "triggerTime": "2025-03-31T09:00:00Z", "executeFunction": "sampleFunction" },
+  { "triggerTime": "2025-04-15T09:00:00Z", "executeFunction": "sampleFunction" }
 ]
 ```
 

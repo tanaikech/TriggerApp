@@ -863,18 +863,32 @@ function sample(e) {
   ];
 
   const res = TriggerApp.setEventObject(e).installTriggers(obj, console.log);
+  console.log(res);
+}
+```
 
-  // Or, if you want to check the trigger times, please use the following script.
-  // const res = TriggerApp.setEventObject(e).simulateTriggers(obj, console.log);
+Here, please use `0` for the month-end. When this script is run at June 26, 2024, the time-driven triggers will be run with the following steps. This steps can be obtained by the following script.
 
+```javascript
+function sample(e) {
+  const obj = [
+    {
+      ownFunctionName: "sample",
+      functionName: "sampleFunction",
+      everyMonth: [15, 0],
+      atTimes: ["09:00:00"],
+    },
+  ];
+
+  // const res = TriggerApp.setEventObject(e).installTriggers(obj, console.log);
+
+  const res = TriggerApp.setEventObject(e).simulateTriggers(obj, console.log);
   const str = res.map(({ triggerTime, executeFunction }) => ({ triggerTime: Utilities.formatDate(triggerTime, Session.getScriptTimeZone(), "yyyy-MM-dd'T'HH:mm:ss'Z'"), executeFunction }));
   console.log(JSON.stringify(str));
 }
 ```
 
-Here, please use `0` for the month-end. When this script is run at June 26, 2024, the time-driven triggers will be run with the following steps.
-
-```
+```json
 [
   { "triggerTime": "2024-06-30T09:00:00Z", "executeFunction": "sampleFunction" },
   { "triggerTime": "2024-07-15T09:00:00Z", "executeFunction": "sampleFunction" },

@@ -867,26 +867,7 @@ function sample(e) {
 }
 ```
 
-Here, please use `0` for the month-end. When this script is run at June 26, 2024, the time-driven triggers will be run with the following steps. This steps can be obtained by the following script.
-
-```javascript
-function sample(e) {
-  const obj = [
-    {
-      ownFunctionName: "sample",
-      functionName: "sampleFunction",
-      everyMonth: [15, 0],
-      atTimes: ["09:00:00"],
-    },
-  ];
-
-  // const res = TriggerApp.setEventObject(e).installTriggers(obj, console.log);
-
-  const res = TriggerApp.setEventObject(e).simulateTriggers(obj, console.log);
-  const str = res.map(({ triggerTime, executeFunction }) => ({ triggerTime: Utilities.formatDate(triggerTime, Session.getScriptTimeZone(), "yyyy-MM-dd'T'HH:mm:ss'Z'"), executeFunction }));
-  console.log(JSON.stringify(str));
-}
-```
+Here, please use `0` for the month-end. When this script is run at June 26, 2024, the time-driven triggers will be run with the following timeline.
 
 ```json
 [
@@ -911,6 +892,27 @@ function sample(e) {
   { "triggerTime": "2025-03-31T09:00:00Z", "executeFunction": "sampleFunction" },
   { "triggerTime": "2025-04-15T09:00:00Z", "executeFunction": "sampleFunction" }
 ]
+```
+
+This timeline can be obtained by the following script.
+
+```javascript
+function sample(e) {
+  const obj = [
+    {
+      ownFunctionName: "sample",
+      functionName: "sampleFunction",
+      everyMonth: [15, 0],
+      atTimes: ["09:00:00"],
+    },
+  ];
+
+  // const res = TriggerApp.setEventObject(e).installTriggers(obj, console.log);
+
+  const res = TriggerApp.setEventObject(e).simulateTriggers(obj, console.log);
+  const str = res.map(({ triggerTime, executeFunction }) => ({ triggerTime: Utilities.formatDate(triggerTime, Session.getScriptTimeZone(), "yyyy-MM-dd'T'HH:mm:ss'Z'"), executeFunction }));
+  console.log(JSON.stringify(str));
+}
 ```
 
 ## Other samples

@@ -993,4 +993,8 @@ You can see it on [my Medium page](https://medium.com/google-cloud/easily-managi
   1. The calculation for increasing the month was modified.
   2. A new scenario 8 was added. In scenario 8, you can see how to use the month-end. [Ref](#scenario8)
 
+- v1.0.4 (June 26, 2024)
+
+  1. Modified the calculation for increasing a month.
+
 [TOP](#top)

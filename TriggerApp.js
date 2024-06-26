@@ -619,6 +619,16 @@ class TriggerApp {
   }
 
   getNextDateTime_(obj, setTimeValues) {
+
+    // I modified the script from https://stackoverflow.com/a/2706169
+    function addMonths(date) {
+      var d = date.getDate();
+      date.setMonth(date.getMonth() + 1);
+      if (date.getDate() != d) {
+        date.setDate(0);
+      }
+    }
+
     const self = this;
     if (!setTimeValues || (Array.isArray(setTimeValues) && setTimeValues.length == 0)) {
       setTimeValues = ["00:00"];
@@ -661,28 +671,17 @@ class TriggerApp {
             o[k] = t;
           }
         } else if (v !== undefined && k == "everyMonth") {
-
-          // ref: https://stackoverflow.com/a/2706169
-          function addMonths(date, months) {
-            var d = date.getDate();
-            date.setMonth(date.getMonth() + +months);
-            if (date.getDate() != d) {
-              date.setDate(0);
-            }
-            return date;
-          }
-
           const dateObj = v.flatMap(e => {
             return setTimeValues.map(tt => {
               const temp = new Date(self.nowTime);
               const td = temp.getDate();
               if (td > e) {
-                addMonths(temp, 1);
+                addMonths(temp);
               }
               temp.setDate(e);
               temp.setHours(...tt.split(":").map(f => Number(f)), 0, 0);
               if (temp.getTime() <= self.nowTime) {
-                temp.setMonth(temp.getMonth() + 1);
+                addMonths(temp);
               }
               return temp;
             });
@@ -714,7 +713,7 @@ class TriggerApp {
                 temp.setFullYear(t1y);
               }
               if (t2m > t1m) {
-                temp.setMonth(temp.getMonth() + 1);
+                addMonths(temp);
               } else {
                 temp.setMonth(t1m);
               }

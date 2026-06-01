@@ -5,14 +5,14 @@
  * @const {string}
  * @readonly
  */
-var appName = "TriggerApp";
+const appName = "TriggerApp";
 
 /**
  * ### Description
  * Give the event object from the time-driven trigger.
- * 
+ *
  * @param {Object} object Event object from trigger.
- * @return {TriggerApp}
+ * @return {this}
  */
 function setEventObject(object = null) {
   this.eventObj = object || null;
@@ -23,9 +23,9 @@ function setEventObject(object = null) {
  * ### Description
  * When this method is used, the custom current date time can be used.
  * If this is not used, the current date time is used.
- * 
+ *
  * @param {Date} dateObj Event object from trigger.
- * @return {TriggerApp}
+ * @return {this}
  */
 function setCustomNow(dateObj = null) {
   if (!dateObj) {
@@ -43,9 +43,9 @@ function setCustomNow(dateObj = null) {
  * Unit is second. Default value is 60 seconds.
  * Difference of trigger time between "ownFunctionName" and "functionName". When this value is small, the trigger is reset by "ownFunctionName". By this, "functionName" is not run.
  * Please adjust this value from your script of "functionName" of your work function.
- * 
- * @param {Number} triggerOffset Trigger offset time.
- * @return {TriggerApp}
+ *
+ * @param {Number} diffTriggerTime Trigger offset time.
+ * @return {this}
  */
 function setDiffTriggerTime(diffTriggerTime = 60) {
   this.diffTriggerTime = diffTriggerTime * 1000;
@@ -56,9 +56,9 @@ function setDiffTriggerTime(diffTriggerTime = 60) {
  * ### Description
  * Unit is second. Default value is 0 s. When the date time of a new trigger is calculated,
  * if you want to give a wait time, you can set it using this method.
- * 
+ *
  * @param {Number} easeTime Number.
- * @return {TriggerApp}
+ * @return {this}
  */
 function setEase(easeTime = 0) {
   this.ease = easeTime * 1000;
@@ -69,9 +69,9 @@ function setEase(easeTime = 0) {
  * ### Description
  * Unit is second. Default value is 0 s.
  * When the script is run, when the date time for the next trigger time is very small, you can avoid this by this method.
- * 
+ *
  * @param {Number} waitTime Wait time.
- * @return {TriggerApp}
+ * @return {this}
  */
 function setScriptWaitTime(waitTime = 0) {
   this.wait = waitTime * 1000;
@@ -82,9 +82,9 @@ function setScriptWaitTime(waitTime = 0) {
  * ### Description
  * Unit is second. Default value is 0.
  * When the trigger time is just time and an error occurs, increase this value. But, the most cases will be worked with 0.
- * 
+ *
  * @param {Number} triggerOffset Trigger offset time.
- * @return {TriggerApp}
+ * @return {this}
  */
 function setTriggerOffsetTime(triggerOffset = 0) {
   this.triggerOffset = triggerOffset * 1000;
@@ -96,9 +96,9 @@ function setTriggerOffsetTime(triggerOffset = 0) {
  * Default value is 20. When the simulation of triggers is run, set the maximum number of results.
  * When "toDay" is not set in the inputted object, the infinite results are returned. This is used for fixing the number of results.
  * When "toDay" is set in the inputted object, all results are returned.
- * 
+ *
  * @param {Number} maximumOutput Maximum number of results for the trigger simulation.
- * @return {TriggerApp}
+ * @return {this}
  */
 function setMaxOutputForSimulation(maximumOutput = 20) {
   this.maximumOutput = maximumOutput;
@@ -109,73 +109,99 @@ function setMaxOutputForSimulation(maximumOutput = 20) {
  * ### Description
  * This is the main method of this library.
  * By giving the parameters, the specific functions are executed by the time-driven triggers.
- * 
+ *
  * @param {Object[]} object Array including the objects for installing the time-driven triggers.
- * @param {Callback} callback
+ * @param {Function} callback Callback function from process.
  * @return {Object} Return value.
  */
 function installTriggers(object, callback) {
-  const keys = ["eventObj", "nowFixed", "nowTimeFixed", "now", "nowTime", "ease", "wait", "triggerOffset", "diffTriggerTime"];
-  const values = keys.map(k => [k, this[k]]);
+  const keys = [
+    "eventObj",
+    "nowFixed",
+    "nowTimeFixed",
+    "now",
+    "nowTime",
+    "ease",
+    "wait",
+    "triggerOffset",
+    "diffTriggerTime",
+  ];
+  const values = keys.map((k) => [k, this[k]]);
   const TA = new TriggerApp(values);
-  const type = "installTriggers";
-  return TA.installTriggers(object, callback, type);
+  return TA.installTriggers(object, callback, "installTriggers");
 }
-/**
- * ### Description
- * Callback function from process.
- *
- * @callback Callback
- * @param {string} res Return the processes.
- */
 
 /**
  * ### Description
  * This method installs the tasks given by data output from simulateTriggers method as the time-driven trigger.
- * 
+ *
  * @param {Object} object including the own function name and the array objects for installing the time-driven triggers.
  * @return {Object} Return value.
  */
 function installTriggersByData(object) {
-  const keys = ["eventObj", "nowFixed", "nowTimeFixed", "now", "nowTime", "ease", "wait", "triggerOffset", "diffTriggerTime"];
-  const values = keys.map(k => [k, this[k]]);
+  const keys = [
+    "eventObj",
+    "nowFixed",
+    "nowTimeFixed",
+    "now",
+    "nowTime",
+    "ease",
+    "wait",
+    "triggerOffset",
+    "diffTriggerTime",
+  ];
+  const values = keys.map((k) => [k, this[k]]);
   const TA = new TriggerApp(values);
-  const type = "installTriggersByData";
-  return TA.installTriggersByData(object, type);
+  return TA.installTriggersByData(object, "installTriggersByData");
 }
 
 /**
  * ### Description
  * This method can simulate the time-driven triggers by inputting the actual object for the setTriggers method.
- * 
+ *
  * @param {Object[]} object Array including the objects for checking the time-driven triggers.
- * @param {Callback} callback
- * @return {Object[]} Return values including the information ofthe time-driven triggers.
+ * @param {Function} callback Callback function from process.
+ * @return {Object[]} Return values including the information of the time-driven triggers.
  */
 function simulateTriggers(object, callback) {
-  const keys = ["eventObj", "nowFixed", "nowTimeFixed", "now", "nowTime", "ease", "wait", "triggerOffset", "diffTriggerTime", "maximumOutput"];
-  const values = keys.map(k => [k, this[k]]);
+  const keys = [
+    "eventObj",
+    "nowFixed",
+    "nowTimeFixed",
+    "now",
+    "nowTime",
+    "ease",
+    "wait",
+    "triggerOffset",
+    "diffTriggerTime",
+    "maximumOutput",
+  ];
+  const values = keys.map((k) => [k, this[k]]);
   const TA = new TriggerApp(values);
-  const type = "simulateTriggers";
-  return TA.simulateTriggers(object, callback, type);
+  return TA.simulateTriggers(object, callback, "simulateTriggers");
 }
-/**
- * ### Description
- * Callback function from process.
- *
- * @callback Callback
- * @param {string} res Return the processes.
- */
 
 /**
  * ### Description
  * Delete all project triggers of the current Google Apps Script project.
  * This method can be used independently from other methods.
- * 
- * @return {void}
+ *
+ * @return {null}
  */
 function deleteAllTriggers() {
-  const values = ["eventObj", "nowFixed", "nowTimeFixed", "now", "nowTime", "ease", "wait", "triggerOffset", "diffTriggerTime", "maximumOutput"].map(e => [e, null]);
+  const keys = [
+    "eventObj",
+    "nowFixed",
+    "nowTimeFixed",
+    "now",
+    "nowTime",
+    "ease",
+    "wait",
+    "triggerOffset",
+    "diffTriggerTime",
+    "maximumOutput",
+  ];
+  const values = keys.map((k) => [k, null]);
   return new TriggerApp(values).deleteAllTriggers_();
 }
 
@@ -185,9 +211,11 @@ class TriggerApp {
     const nowTime = now.getTime();
     const nowFixed = new Date();
     const nowTimeFixed = nowFixed.getTime();
+
     this.infiniteDateObj = new Date();
     this.infiniteDateObj.setFullYear(this.infiniteDateObj.getFullYear() + 100);
     this.infiniteDateTime = this.infiniteDateObj.getTime();
+
     const defaultValues = {
       now,
       nowTime,
@@ -199,99 +227,148 @@ class TriggerApp {
       diffTriggerTime: 60000,
       maximumOutput: 20,
     };
-    for (let i = 0; i < values.length; i++) {
-      const v = values[i];
-      this[v[0]] = v[1] || defaultValues[v[0]];
-    }
+
+    values.forEach(([key, val]) => {
+      this[key] = val ?? defaultValues[key];
+    });
 
     this.timezone = Session.getScriptTimeZone();
-    this.dateKeys = ["atTimes", "everyWeek", "everyMonth", "everyYear", "everyDay"];
-    this.weekDays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-
-    this.minimumIntervalToNextTrigger = 60; // Unit is second. This value means that the minimum interval from the current trigger to the next trigger. The default is 60 seconds. In the current stage, when the minimum interval time is less than 60 seconds, the time-driven trigger cannot be installed by the function executed by the time-driven trigger. By this, I fixed the minimum interval time as 60 seconds.
+    this.dateKeys = [
+      "atTimes",
+      "everyWeek",
+      "everyMonth",
+      "everyYear",
+      "everyDay",
+    ];
+    this.weekDays = [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+    ];
+    this.minimumIntervalToNextTrigger = 60; // Unit is second.
   }
 
   // --- methods start
 
   installTriggers(object, callback, type) {
-    const start_time = Date.now();
+    const startTime = Date.now();
     const responseObj = {};
-    const { triggerDateTimeObject, message } = this.getTriggerDateTimeObject_(object, callback, type);
+    const { triggerDateTimeObject, message } = this.getTriggerDateTimeObject_(
+      object,
+      callback,
+      type,
+    );
+
     if (triggerDateTimeObject && !message) {
       const { obj, triggerDateTime } = triggerDateTimeObject;
-      const installedTrigger1 = this.installTrigger_(obj.functionName, triggerDateTime);
+      const installedTrigger1 = this.installTrigger_(
+        obj.functionName,
+        triggerDateTime,
+      );
+
       responseObj[obj.functionName] = {
         triggerDateTime,
         triggerSourceId: installedTrigger1.getTriggerSourceId(),
         uniqueId: installedTrigger1.getUniqueId(),
-        scriptExecutedTime: this.now
+        scriptExecutedTime: this.now,
       };
+
       if (obj.toDayTime > this.nowTimeFixed) {
-        const triggerDateTimeWithDiff = new Date(triggerDateTime.getTime() + this.diffTriggerTime);
-        const installedTrigger2 = this.installTrigger_(obj.ownFunctionName, triggerDateTimeWithDiff);
+        const triggerDateTimeWithDiff = new Date(
+          triggerDateTime.getTime() + this.diffTriggerTime,
+        );
+        const installedTrigger2 = this.installTrigger_(
+          obj.ownFunctionName,
+          triggerDateTimeWithDiff,
+        );
+
         responseObj[obj.ownFunctionName] = {
           triggerDateTime: triggerDateTimeWithDiff,
           triggerSourceId: installedTrigger2.getTriggerSourceId(),
           uniqueId: installedTrigger2.getUniqueId(),
-          scriptExecutedTime: this.now
+          scriptExecutedTime: this.now,
         };
       } else {
         responseObj[obj.ownFunctionName] = {
           message: `"${obj.ownFunctionName}" is not installed as the time-driven trigger. Because there is no the next trigger task.`,
-          scriptExecutedTime: this.now
+          scriptExecutedTime: this.now,
         };
       }
     } else {
       responseObj.done = { message: "All trigger tasks were finished." };
     }
-    const end_time = Date.now();
-    responseObj.processTime = (end_time - start_time) / 1000;
+
+    responseObj.processTime = (Date.now() - startTime) / 1000;
     return responseObj;
   }
 
   installTriggersByData(object, type) {
-    const start_time = Date.now();
+    const startTime = Date.now();
     const responseObj = {};
-    const self = this;
-    if (self.wait > 0) {
-      Utilities.sleep(self.wait);
-    }
-    if (!object.hasOwnProperty("ownFunctionName") || !object.hasOwnProperty("data")) {
+    this.sleepIfRequired_();
+
+    if (!object?.ownFunctionName || !object?.data) {
       throw new Error("Invalid object.");
     }
-    const newAr = object.data.map(o => {
-      if (!o.hasOwnProperty("triggerTime") || !o.hasOwnProperty("executeFunction")) {
-        throw new Error("Invalid object.");
-      }
-      if (o.triggerTime && !(o.triggerTime instanceof Date)) {
-        o.triggerTime = new Date(o.triggerTime);
-      }
-      o.triggerTime = o.triggerTime.getTime();
-      return o;
-    }).sort((a, b) => a.triggerTime > b.triggerTime ? 1 : -1);
-    if (type == "installTriggersByData") {
-      self.deleteTriggers_([object.ownFunctionName, ...(new Set(object.data.map(({ executeFunction }) => executeFunction)))]);
+
+    const tasks = object.data
+      .map((o) => {
+        if (!o.triggerTime || !o.executeFunction) {
+          throw new Error("Invalid object.");
+        }
+        const triggerTimeMs =
+          o.triggerTime instanceof Date
+            ? o.triggerTime.getTime()
+            : new Date(o.triggerTime).getTime();
+        return { ...o, triggerTime: triggerTimeMs };
+      })
+      .sort((a, b) => a.triggerTime - b.triggerTime);
+
+    if (type === "installTriggersByData") {
+      const functionList = [
+        object.ownFunctionName,
+        ...new Set(tasks.map((t) => t.executeFunction)),
+      ];
+      this.deleteTriggers_(functionList);
     }
-    const nextTriggerTime = newAr.find(({ triggerTime }) => triggerTime > self.nowTime);
-    if (nextTriggerTime) {
-      nextTriggerTime.triggerTime = new Date(nextTriggerTime.triggerTime);
-      const { triggerTime, executeFunction } = nextTriggerTime;
-      const installedTrigger1 = self.installTrigger_(executeFunction, triggerTime);
+
+    const nextTask = tasks.find((t) => t.triggerTime > this.nowTime);
+
+    if (nextTask) {
+      const triggerDateTime = new Date(nextTask.triggerTime);
+      const { executeFunction } = nextTask;
+      const installedTrigger1 = this.installTrigger_(
+        executeFunction,
+        triggerDateTime,
+      );
+
       responseObj[executeFunction] = {
-        triggerDateTime: triggerTime,
+        triggerDateTime,
         triggerSourceId: installedTrigger1.getTriggerSourceId(),
         uniqueId: installedTrigger1.getUniqueId(),
-        scriptExecutedTime: self.now
+        scriptExecutedTime: this.now,
       };
-      const n = newAr.findIndex(({ triggerTime }) => triggerTime > self.nowTime);
-      if (n != newAr.length - 1) {
-        const triggerDateTimeWithDiff = new Date(triggerTime.getTime() + self.diffTriggerTime);
-        const installedTrigger2 = self.installTrigger_(object.ownFunctionName, triggerDateTimeWithDiff);
+
+      const taskIndex = tasks.findIndex((t) => t === nextTask);
+      const isNotLast = taskIndex !== tasks.length - 1;
+
+      if (isNotLast) {
+        const triggerDateTimeWithDiff = new Date(
+          triggerDateTime.getTime() + this.diffTriggerTime,
+        );
+        const installedTrigger2 = this.installTrigger_(
+          object.ownFunctionName,
+          triggerDateTimeWithDiff,
+        );
         responseObj[object.ownFunctionName] = {
           triggerDateTime: triggerDateTimeWithDiff,
           triggerSourceId: installedTrigger2.getTriggerSourceId(),
           uniqueId: installedTrigger2.getUniqueId(),
-          scriptExecutedTime: self.now
+          scriptExecutedTime: this.now,
         };
       } else {
         responseObj[executeFunction].lastTask = true;
@@ -300,164 +377,185 @@ class TriggerApp {
     } else {
       responseObj.done = { message: "All trigger tasks were finished." };
     }
-    const end_time = Date.now();
-    responseObj.processTime = (end_time - start_time) / 1000;
+
+    responseObj.processTime = (Date.now() - startTime) / 1000;
     return responseObj;
   }
 
   simulateTriggers(ar, callback, type) {
-    callback("### Start trigger simulation");
-    let maxOutput = -1;
-    const toDayCheck = ar.some(o => !o.hasOwnProperty("toDay"));
-    if (toDayCheck) {
-      maxOutput = this.maximumOutput;
-    }
+    if (callback) callback("### Start trigger simulation");
+    const hasInfinite = ar.some((o) => !o.hasOwnProperty("toDay"));
+    const maxOutput = hasInfinite ? this.maximumOutput : -1;
+
     this.eventObj = "dummy";
     const result = [];
-    let next;
+    let nextDate;
+
     do {
       const res = this.getTriggerDateTimeObject_(ar, callback, type);
-      if (res.triggerDateTimeObject && res.triggerDateTimeObject.triggerDateTime) {
-        next = res.triggerDateTimeObject.triggerDateTime;
-        this.setCustomNow_(next);
-        const retObj = { triggerTime: next, executeFunction: res.triggerDateTimeObject.obj.functionName };
+      nextDate = res.triggerDateTimeObject?.triggerDateTime || null;
+
+      if (nextDate) {
+        this.setCustomNow_(nextDate);
+        const retObj = {
+          triggerTime: nextDate,
+          executeFunction: res.triggerDateTimeObject.obj.functionName,
+        };
         result.push(retObj);
-        callback(retObj);
-      } else {
-        next = null;
+        if (callback) callback(retObj);
       }
-      if (maxOutput != -1 && result.length >= maxOutput) {
-        break;
-      }
-    } while (next);
+
+      if (maxOutput !== -1 && result.length >= maxOutput) break;
+    } while (nextDate);
+
     let msg = "### End trigger simulation";
-    if (maxOutput > 0) {
+    if (maxOutput > 0)
       msg += "\n### Forced stopped calculation because of infinite triggers.";
-    }
-    callback(msg);
+    if (callback) callback(msg);
+
     return result;
   }
 
   // --- methods end
 
+  sleepIfRequired_() {
+    if (this.wait > 0) Utilities.sleep(this.wait);
+  }
+
   setCustomNow_(now) {
     this.nowFixed = now;
-    this.nowTimeFixed = this.nowFixed.getTime();
+    this.nowTimeFixed = now.getTime();
     this.now = now;
-    this.nowTime = this.now.getTime();
+    this.nowTime = now.getTime();
     return this;
   }
 
   getTriggerDateTimeObject_(object, callback, type) {
-    const self = this;
-    if (self.wait > 0) {
-      Utilities.sleep(self.wait);
-    }
+    this.sleepIfRequired_();
+
     const ar = JSON.parse(JSON.stringify(object));
-    self.objectErrorCheck_(ar, type);
-    const res = ar.reduce((arr, obj) => {
-      if (obj.fromTime && obj.toTime && obj.interval) {
-        const r = self.continuousTriggers_(obj, callback);
-        if (
-          (obj.toDayTime && r.getTime() > self.nowTimeFixed && r.getTime() < obj.toDayTime) ||
-          (!obj.toDayTime && r.getTime() > self.nowTimeFixed)
-        ) {
-          arr.push({ obj, triggerDateTime: r });
-        }
-      } else {
-        const r = self.pointTriggers_(obj, callback);
-        if (
-          (obj.toDayTime && r.getTime() > self.nowTimeFixed && r.getTime() < obj.toDayTime) ||
-          (!obj.toDayTime && r.getTime() > self.nowTimeFixed)
-        ) {
-          arr.push({ obj, triggerDateTime: r });
-        }
+    this.objectErrorCheck_(ar, type);
+
+    const candidates = ar.reduce((arr, obj) => {
+      const isContinuous = obj.fromTime && obj.toTime && obj.interval;
+      const triggerTime = isContinuous
+        ? this.continuousTriggers_(obj, callback)
+        : this.pointTriggers_(obj, callback);
+
+      if (!triggerTime) return arr;
+
+      const isAfterNow = triggerTime.getTime() > this.nowTimeFixed;
+      const isBeforeToDay =
+        !obj.toDayTime || triggerTime.getTime() < obj.toDayTime;
+
+      if (isAfterNow && isBeforeToDay) {
+        arr.push({ obj, triggerDateTime: triggerTime });
       }
       return arr;
     }, []);
 
-    if (res.length > 0) {
-      const installDateTime = res.sort((a, b) => a.triggerDateTime.getTime() > b.triggerDateTime.getTime() ? 1 : -1);
-      const check = installDateTime.slice().reverse().some(({ triggerDateTime }, i, a) => {
-        if (a[i + 1] && triggerDateTime.getTime() - a[i + 1].triggerDateTime.getTime() <= (self.minimumIntervalToNextTrigger * 1000)) {
-          return true;
+    if (candidates.length > 0) {
+      candidates.sort(
+        (a, b) => a.triggerDateTime.getTime() - b.triggerDateTime.getTime(),
+      );
+
+      const checkInterval = candidates.some((cand, i, arr) => {
+        if (i < arr.length - 1) {
+          const diff =
+            arr[i + 1].triggerDateTime.getTime() -
+            cand.triggerDateTime.getTime();
+          return diff <= this.minimumIntervalToNextTrigger * 1000;
         }
         return false;
       });
-      if (check) {
-        throw new Error("The interval between the current trigger and the next trigger is small.");
+
+      if (checkInterval) {
+        throw new Error(
+          "The interval between the current trigger and the next trigger is small.",
+        );
       }
-      return { triggerDateTimeObject: installDateTime[0] };
-    } else {
-      return { message: "There are no tasks for installing." };
+
+      return { triggerDateTimeObject: candidates[0] };
     }
+
+    return { message: "There are no tasks for installing." };
   }
 
   objectErrorCheck_(ar, type) {
     if (!ar || !Array.isArray(ar)) {
-      throw new Error("Please input an array including object for using this library.");
+      throw new Error(
+        "Please input an array including object for using this library.",
+      );
     }
-    ar.forEach(function (obj, i) {
-      const {
-        ownFunctionName,
-        functionName,
-        everyDay,
-        everyWeek,
-        everyMonth,
-        everyYear,
-        interval,
-        atTimes,
-        fromDay,
-        toDay,
-      } = obj;
-      if (type == "installTriggers") {
-        this.deleteTriggers_([ownFunctionName, functionName]);
+
+    if (type === "installTriggers") {
+      const functionsToDelete = ar
+        .flatMap((obj) => [obj.ownFunctionName, obj.functionName])
+        .filter(Boolean);
+      if (functionsToDelete.length > 0) {
+        this.deleteTriggers_([...new Set(functionsToDelete)]);
       }
+    }
+
+    ar.forEach((obj) => {
       if (!this.eventObj) {
-        if (!atTimes && !everyDay && !everyWeek && !everyMonth && !everyYear) {
-          throw new Error("Please set date time values of atTimes, everyWeek, everyMonth, everyYear.");
+        if (
+          !obj.atTimes &&
+          !obj.everyDay &&
+          !obj.everyWeek &&
+          !obj.everyMonth &&
+          !obj.everyYear
+        ) {
+          throw new Error(
+            "Please set date time values of atTimes, everyWeek, everyMonth, everyYear.",
+          );
         }
-        if (!functionName) {
-          throw new Error("Please set the work function name of the function you want to execute by the time-driven trigger.");
+        if (!obj.functionName) {
+          throw new Error(
+            "Please set the work function name of the function you want to execute by the time-driven trigger.",
+          );
         }
-        if (!ownFunctionName) {
-          throw new Error("Please set the function name of function using TriggerApp of this library.");
+        if (!obj.ownFunctionName) {
+          throw new Error(
+            "Please set the function name of function using TriggerApp of this library.",
+          );
         }
-        if (interval < this.minimumIntervalToNextTrigger) {
-          throw new Error(`Your inputted interval (${interval} seconds) between the current trigger and the next trigger is smaller than ${this.minimumIntervalToNextTrigger} seconds. Please modify it.`);
+        if (obj.interval < this.minimumIntervalToNextTrigger) {
+          throw new Error(
+            `Your inputted interval (${obj.interval} seconds) between the current trigger and the next trigger is smaller than ${this.minimumIntervalToNextTrigger} seconds. Please modify it.`,
+          );
         }
-        if (interval <= 90) {
-          // If "interval" is 90 seconds, set "diffTriggerTime" 30 seconds, because of the unstable start time for executing the function on the Google side.
+        if (obj.interval <= 90) {
           this.diffTriggerTime = 30000;
         }
       }
-      if (toDay) {
-        const toDayObj = new Date(toDay);
-        const toDayTime = toDayObj.getTime();
+
+      if (obj.toDay) {
+        const toDayObj = new Date(obj.toDay);
+        obj.toDayTime = toDayObj.getTime();
         obj.toDayObj = toDayObj;
-        obj.toDayTime = toDayTime;
-        if (!this.eventObj && this.nowTime > toDayTime) {
+        if (!this.eventObj && this.nowTime > obj.toDayTime) {
           throw new Error("'toDay' is smaller than current date.");
         }
       } else {
         obj.toDayObj = this.infiniteDateObj;
         obj.toDayTime = this.infiniteDateTime;
       }
-      if (fromDay) {
-        const fromDayObj = new Date(fromDay);
-        const fromDayTime = fromDayObj.getTime();
+
+      if (obj.fromDay) {
+        const fromDayObj = new Date(obj.fromDay);
+        obj.fromDayTime = fromDayObj.getTime();
         obj.fromDayObj = fromDayObj;
-        obj.fromDayTime = fromDayTime;
       }
+
       const sortedObj = this.sortInputObject_(obj);
-      this.dateKeys.forEach(k => {
-        obj[k] = sortedObj[k];
+      this.dateKeys.forEach((k) => {
+        if (sortedObj[k] !== undefined) obj[k] = sortedObj[k];
       });
-    }, this);
+    });
   }
 
   continuousTriggers_(obj, callback) {
-    const self = this;
     const {
       everyDay,
       everyWeek,
@@ -465,152 +563,166 @@ class TriggerApp {
       everyYear,
       interval,
       fromDay,
-      toDay,
       fromTime,
       toTime,
       fromDayObj,
       fromDayTime,
+      toDay,
       toDayTime,
     } = obj;
-    this.now = this.nowFixed;
+
+    this.now = new Date(this.nowFixed.getTime());
     this.nowTime = this.nowTimeFixed;
-    if (fromDay) {
-      if (this.nowTime < fromDayTime) {
-        this.now = fromDayObj;
-        this.nowTime = fromDayTime;
-      }
+
+    if (fromDay && this.nowTime < fromDayTime) {
+      this.now = new Date(fromDayObj.getTime());
+      this.nowTime = fromDayTime;
     } else {
       obj.fromDay = this.now;
     }
-    let [fromTimeUnix, toTimeUnix] = [fromTime, toTime].map(e => self.convTimeStrToObjWithOffset_(e).getTime());
+
+    const fromTimeUnix = this.convTimeStrToObjWithOffset_(fromTime).getTime();
+    const toTimeUnix = this.convTimeStrToObjWithOffset_(toTime).getTime();
+
     const dateObj = [];
     for (let t1 = fromTimeUnix; t1 <= toTimeUnix; t1 += interval * 1000) {
-      dateObj.push(Utilities.formatDate(new Date(t1), self.timezone, "HH:mm"));
+      dateObj.push(Utilities.formatDate(new Date(t1), this.timezone, "HH:mm"));
     }
+
     const nextDateTimes = this.getNextDateTime_(obj, dateObj);
-    const temp1 = new Date(this.nowTime);
-    temp1.setHours(...fromTime.split(":").map(f => Number(f)));
-    const temp2 = new Date(this.nowTime);
-    temp2.setHours(...toTime.split(":").map(f => Number(f)));
+
+    const temp1 = this.convTimeStrToObjWithOffset_(fromTime);
+    const temp2 = this.convTimeStrToObjWithOffset_(toTime);
     if (temp1.getTime() > temp2.getTime()) {
       throw new Error("Value of fromTime is larger than that of toTime.");
     }
+
     if (everyDay && !everyWeek && !everyMonth && !everyYear) {
-      callback("Detected 'everyDay' trigger.");
+      if (callback) callback("Detected 'everyDay' trigger.");
       return nextDateTimes.everyDay;
     } else if (!everyDay && everyWeek && !everyMonth && !everyYear) {
-      callback("Detected 'everyWeek' trigger.");
+      if (callback) callback("Detected 'everyWeek' trigger.");
       return nextDateTimes.everyWeek;
     } else if (!everyDay && !everyWeek && everyMonth && !everyYear) {
-      callback("Detected 'everyMonth' trigger.");
+      if (callback) callback("Detected 'everyMonth' trigger.");
       return nextDateTimes.everyMonth;
     } else if (!everyDay && !everyWeek && !everyMonth && everyYear) {
-      callback("Detected 'everyYear' trigger.");
-      if (fromDay && toDay) {
-        const check = everyYear.every(e => {
-          const t = new Date(e).getTime();
-          return fromDayTime < t && t < toDayTime;
-        });
-        if (!self.eventObj && !check) {
-          throw new Error("Values of 'everyYear' are out of range of 'fromDay' and 'toDay'.");
-        }
-      } else if (fromDay) {
-        const check = everyYear.every(e => fromDayTime < new Date(e).getTime());
-        if (!self.eventObj && !check) {
-          throw new Error("Values of 'everyYear' are out of range of 'fromDay' and 'toDay'.");
-        }
-      } else if (toDay) {
-        const check = everyYear.every(e => new Date(e).getTime() < toDayTime);
-        if (!self.eventObj && !check) {
-          throw new Error("Values of 'everyYear' are out of range of 'fromDay' and 'toDay'.");
-        }
+      if (callback) callback("Detected 'everyYear' trigger.");
+
+      const isYearValid = everyYear.every((e) => {
+        const t = new Date(e).getTime();
+        const afterFrom = fromDay ? fromDayTime < t : true;
+        const beforeTo = toDay ? t < toDayTime : true;
+        return afterFrom && beforeTo;
+      });
+
+      if (!this.eventObj && !isYearValid) {
+        throw new Error(
+          "Values of 'everyYear' are out of range of 'fromDay' and 'toDay'.",
+        );
       }
       return nextDateTimes.everyYear;
-    } else {
-      throw new Error("The required values are not included in the inputted object.");
     }
+    throw new Error(
+      "The required values are not included in the inputted object.",
+    );
   }
 
   pointTriggers_(obj, callback) {
-    const { atTimes, everyDay, everyWeek, everyMonth, everyYear, fromDay, fromDayTime, fromDayObj } = obj;
+    const {
+      atTimes,
+      everyDay,
+      everyWeek,
+      everyMonth,
+      everyYear,
+      fromDay,
+      fromDayTime,
+      fromDayObj,
+    } = obj;
+
     this.now = new Date(this.nowFixed.getTime());
     this.nowTime = this.nowTimeFixed;
-    if (fromDay) {
-      if (this.nowTime < fromDayTime) {
-        this.now = fromDayObj;
-        this.nowTime = fromDayTime;
-      }
+
+    if (fromDay && this.nowTime < fromDayTime) {
+      this.now = new Date(fromDayObj.getTime());
+      this.nowTime = fromDayTime;
     } else {
       obj.fromDay = this.now;
     }
+
     if (atTimes) {
       const nextDateTimes = this.getNextDateTime_(obj, atTimes);
-      if (atTimes && !everyDay && !everyWeek && !everyMonth && !everyYear) {
-        callback("Detected 'atTimes' trigger.");
+      if (!everyDay && !everyWeek && !everyMonth && !everyYear) {
+        if (callback) callback("Detected 'atTimes' trigger.");
         return nextDateTimes.atTimes;
-      } else if (atTimes && everyDay && !everyWeek && !everyMonth && !everyYear) {
-        callback("Detected 'atTimes and everyDay' trigger.");
+      } else if (everyDay && !everyWeek && !everyMonth && !everyYear) {
+        if (callback) callback("Detected 'atTimes and everyDay' trigger.");
         return nextDateTimes.everyDay;
-      } else if (atTimes && !everyDay && everyWeek && !everyMonth && !everyYear) {
-        callback("Detected 'atTimes and everyWeek' trigger.");
+      } else if (!everyDay && everyWeek && !everyMonth && !everyYear) {
+        if (callback) callback("Detected 'atTimes and everyWeek' trigger.");
         return nextDateTimes.everyWeek;
-      } else if (atTimes && !everyDay && !everyWeek && everyMonth && !everyYear) {
-        callback("Detected 'atTimes and everyMonth' trigger.");
+      } else if (!everyDay && !everyWeek && everyMonth && !everyYear) {
+        if (callback) callback("Detected 'atTimes and everyMonth' trigger.");
         return nextDateTimes.everyMonth;
-      } else if (atTimes && !everyDay && !everyWeek && !everyMonth && everyYear) {
-        callback("Detected 'atTimes and everyYear' trigger.");
+      } else if (!everyDay && !everyWeek && !everyMonth && everyYear) {
+        if (callback) callback("Detected 'atTimes and everyYear' trigger.");
         return nextDateTimes.everyYear;
       }
     }
-    throw new Error("The required values are not included in the inputted object.");
+    throw new Error(
+      "The required values are not included in the inputted object.",
+    );
   }
 
   installTrigger_(functionName, dateTimeObj) {
-    return ScriptApp.newTrigger(functionName).timeBased().at(dateTimeObj).create();
+    return ScriptApp.newTrigger(functionName)
+      .timeBased()
+      .at(dateTimeObj)
+      .create();
   }
 
   deleteAllTriggers_() {
-    ScriptApp.getProjectTriggers().forEach(function (t) {
-      ScriptApp.deleteTrigger(t);
-    }, this);
+    ScriptApp.getProjectTriggers().forEach((t) => ScriptApp.deleteTrigger(t));
     return null;
   }
 
   deleteTriggers_(functionList) {
-    ScriptApp.getProjectTriggers().forEach(function (t) {
-      if (functionList.includes(t.getHandlerFunction())) {
-        ScriptApp.deleteTrigger(t);
-      }
-    }, this);
+    if (!functionList || functionList.length === 0) return null;
+    const funcs = new Set(functionList);
+    ScriptApp.getProjectTriggers().forEach((t) => {
+      if (funcs.has(t.getHandlerFunction())) ScriptApp.deleteTrigger(t);
+    });
     return null;
   }
 
   convTimeStrToObjWithOffset_(s, offset = 0) {
     const temp = new Date(this.nowTime + offset);
-    temp.setHours(...s.split(":").map(f => Number(f)), 0, 0);
+    const [hours, mins, secs = 0] = s.split(":").map(Number);
+    temp.setHours(hours, mins, secs, 0);
     return temp;
   }
 
   sortInputObject_(obj) {
-    const self = this;
-    return this.dateKeys.reduce(function (o, k) {
-      const v = obj[k];
-      if (k in obj) {
-        if (k == "atTimes") {
-          o[k] = v.sort((a, b) => {
-            const temp1 = new Date(self.nowTime);
-            temp1.setHours(...a.split(":").map(f => Number(f)));
-            const temp2 = new Date(self.nowTime);
-            temp2.setHours(...b.split(":").map(f => Number(f)));
-            return temp1.getTime() > temp2.getTime() ? 1 : -1;
+    return this.dateKeys.reduce((o, k) => {
+      if (k in obj && obj[k] !== undefined) {
+        const v = obj[k];
+        if (k === "atTimes") {
+          o[k] = [...v].sort((a, b) => {
+            const t1 = this.convTimeStrToObjWithOffset_(a).getTime();
+            const t2 = this.convTimeStrToObjWithOffset_(b).getTime();
+            return t1 - t2;
           });
-        } else if (k == "everyWeek") {
-          o[k] = v.sort((a, b) => self.weekDays.indexOf(a) > self.weekDays.indexOf(b) ? 1 : -1);
-        } else if (k == "everyMonth") {
-          o[k] = v.sort((a, b) => a > b ? 1 : -1);
-        } else if (k == "everyYear") {
-          o[k] = v.map(e => new Date(e)).sort((a, b) => a.getTime() > b.getTime() ? 1 : -1);
-        } else if (k == "everyDay") {
+        } else if (k === "everyWeek") {
+          o[k] = [...v].sort(
+            (a, b) => this.weekDays.indexOf(a) - this.weekDays.indexOf(b),
+          );
+        } else if (k === "everyMonth") {
+          o[k] = [...v].sort((a, b) => a - b);
+        } else if (k === "everyYear") {
+          o[k] = [...v]
+            .map((e) => new Date(e))
+            .sort((a, b) => a.getTime() - b.getTime());
+        } else if (k === "everyDay") {
           o[k] = v;
         }
       }
@@ -618,155 +730,170 @@ class TriggerApp {
     }, {});
   }
 
-  getNextDateTime_(obj, setTimeValues) {
-
-    // I modified the script from https://stackoverflow.com/a/2706169
-    function addMonths(date) {
-      var d = date.getDate();
-      date.setMonth(date.getMonth() + 1);
-      if (date.getDate() != d) {
-        date.setDate(0);
-      }
+  static addMonths_(date) {
+    const d = date.getDate();
+    date.setMonth(date.getMonth() + 1);
+    if (date.getDate() !== d) {
+      date.setDate(0);
     }
+  }
 
-    const self = this;
-    if (!setTimeValues || (Array.isArray(setTimeValues) && setTimeValues.length == 0)) {
+  getNextDateTime_(obj, setTimeValues = ["00:00"]) {
+    if (!Array.isArray(setTimeValues) || setTimeValues.length === 0) {
       setTimeValues = ["00:00"];
     }
-    const rawValues = this.dateKeys.reduce(function (o, k) {
+
+    const rawValues = this.dateKeys.reduce((o, k) => {
       const v = obj[k];
-      if (v !== undefined && k in obj) {
-        if (k == "atTimes") {
-          const dateObj = v.map(e => {
-            const temp = new Date(self.nowTime);
-            temp.setHours(...e.split(":").map(f => Number(f)), 0, 0);
-            return temp;
+      if (v === undefined || !(k in obj)) return o;
+
+      const thresholdTime = this.nowTime + this.ease;
+
+      if (k === "atTimes") {
+        const dates = v.map((e) => this.convTimeStrToObjWithOffset_(e));
+        const nextTime = dates.find((e) => e.getTime() > thresholdTime);
+
+        if (!nextTime) {
+          const t1 = new Date(this.nowTime);
+          t1.setDate(t1.getDate() + 1);
+          t1.setHours(dates[0].getHours(), dates[0].getMinutes(), 0, 0);
+          o[k] = t1;
+        } else {
+          o[k] = nextTime;
+        }
+      } else if (k === "everyWeek") {
+        const dates = v
+          .flatMap((dayStr) => {
+            return setTimeValues.map((tt) => {
+              const temp = new Date(this.nowTime);
+              const targetDay = this.weekDays.indexOf(dayStr);
+              let daysToAdd = (7 - temp.getDay() + targetDay) % 7;
+              temp.setDate(temp.getDate() + daysToAdd);
+              const [hours, mins, secs = 0] = tt.split(":").map(Number);
+              temp.setHours(hours, mins, secs, 0);
+
+              if (temp.getTime() <= this.nowTime) {
+                temp.setDate(temp.getDate() + 7);
+              }
+              return temp;
+            });
           })
-          const t = dateObj.find(e => e.getTime() > (self.nowTime + self.ease));
-          if (!t) {
-            const t1 = new Date(self.nowTime);
-            t1.setDate(t1.getDate() + 1);
-            t1.setHours(dateObj[0].getHours(), dateObj[0].getMinutes(), 0, 0);
-            o[k] = t1;
-          } else {
-            o[k] = t;
-          }
-        } else if (v !== undefined && k == "everyWeek") {
-          const dateObj = v.flatMap(e => {
-            return setTimeValues.map(tt => {
-              const temp = new Date(self.nowTime);
-              temp.setDate(temp.getDate() + (7 - temp.getDay() + self.weekDays.indexOf(e)) % 7);
-              temp.setHours(...tt.split(":").map(f => Number(f)), 0, 0);
-              if (temp.getTime() <= self.nowTime) {
-                temp.setDate(temp.getDate() + 7 + (7 - temp.getDay() + self.weekDays.indexOf(e)) % 7);
-                temp.setHours(...tt.split(":").map(f => Number(f)), 0, 0);
-              }
-              return temp;
-            });
-          }).sort((a, b) => new Date(a).getTime() > new Date(b).getTime() ? 1 : -1);
-          const t = dateObj.find(e => e.getTime() > (self.nowTime + self.ease));
-          if (!t) {
-            throw new Error("Current date time is out of range of the trigger date time.");
-          } else {
-            o[k] = t;
-          }
-        } else if (v !== undefined && k == "everyMonth") {
-          const dateObj = v.flatMap(e => {
-            return setTimeValues.map(tt => {
-              const temp = new Date(self.nowTime);
+          .sort((a, b) => a.getTime() - b.getTime());
+
+        const nextTime = dates.find((e) => e.getTime() > thresholdTime);
+        if (!nextTime)
+          throw new Error(
+            "Current date time is out of range of the trigger date time.",
+          );
+        o[k] = nextTime;
+      } else if (k === "everyMonth") {
+        const dates = v
+          .flatMap((dayNum) => {
+            return setTimeValues.map((tt) => {
+              const temp = new Date(this.nowTime);
               const td = temp.getDate();
-              if (td > e) {
-                addMonths(temp);
-              }
-              temp.setDate(e);
-              temp.setHours(...tt.split(":").map(f => Number(f)), 0, 0);
-              if (temp.getTime() <= self.nowTime) {
-                addMonths(temp);
+              if (td > dayNum) TriggerApp.addMonths_(temp);
+              temp.setDate(dayNum);
+              const [hours, mins, secs = 0] = tt.split(":").map(Number);
+              temp.setHours(hours, mins, secs, 0);
+
+              if (temp.getTime() <= this.nowTime) {
+                TriggerApp.addMonths_(temp);
+                temp.setDate(dayNum);
               }
               return temp;
             });
-          }).sort((a, b) => new Date(a).getTime() > new Date(b).getTime() ? 1 : -1);
-          const t = dateObj.find(e => e.getTime() > (self.nowTime + self.ease));
-          if (!t) {
-            throw new Error("Current date time is out of range of the trigger date time.");
-          } else {
-            o[k] = t;
-          }
-        } else if (v !== undefined && k == "everyYear") {
-          const dateObj = v.flatMap(e => {
-            const ee = new Date(e);
+          })
+          .sort((a, b) => a.getTime() - b.getTime());
+
+        const nextTime = dates.find((e) => e.getTime() > thresholdTime);
+        if (!nextTime)
+          throw new Error(
+            "Current date time is out of range of the trigger date time.",
+          );
+        o[k] = nextTime;
+      } else if (k === "everyYear") {
+        const dates = v
+          .flatMap((dateStr) => {
+            const ee = new Date(dateStr);
             let t1y = ee.getFullYear();
             const t1m = ee.getMonth();
             const t1d = ee.getDate();
-            const nowYear = self.now.getFullYear()
-            if (t1y < nowYear) {
-              t1y = nowYear;
-            }
-            return setTimeValues.map(tt => {
-              const temp = new Date(self.nowTime);
+            const nowYear = this.now.getFullYear();
+
+            if (t1y < nowYear) t1y = nowYear;
+
+            return setTimeValues.map((tt) => {
+              const temp = new Date(this.nowTime);
               const t2y = temp.getFullYear();
               const t2m = temp.getMonth();
               const t2d = temp.getDate();
-              if (t2y > t1y) {
-                temp.setFullYear(temp.getFullYear() + 1);
-              } else {
-                temp.setFullYear(t1y);
-              }
-              if (t2m > t1m) {
-                addMonths(temp);
-              } else {
-                temp.setMonth(t1m);
-              }
-              if (t2d > t1d) {
-                temp.setDate(temp.getDate() + 1);
-              } else {
-                temp.setDate(t1d);
-              }
-              temp.setHours(...tt.split(":").map(f => Number(f)), 0, 0);
-              if (temp.getTime() <= self.nowTime) {
+
+              if (t2y > t1y) temp.setFullYear(temp.getFullYear() + 1);
+              else temp.setFullYear(t1y);
+
+              if (t2m > t1m) TriggerApp.addMonths_(temp);
+              else temp.setMonth(t1m);
+
+              if (t2d > t1d) temp.setDate(temp.getDate() + 1);
+              else temp.setDate(t1d);
+
+              const [hours, mins, secs = 0] = tt.split(":").map(Number);
+              temp.setHours(hours, mins, secs, 0);
+
+              if (temp.getTime() <= this.nowTime) {
                 temp.setFullYear(temp.getFullYear() + 1);
               }
               return temp;
             });
-          }).sort((a, b) => new Date(a).getTime() > new Date(b).getTime() ? 1 : -1);
-          const t = dateObj.find(e => e.getTime() > (self.nowTime + self.ease));
-          if (!t) {
-            throw new Error("Current date time is out of range of the trigger date time.");
-          } else {
-            o[k] = t;
-          }
-        } else if (v !== undefined && k == "everyDay") {
-          if (v === true) {
-            const dateObj = setTimeValues.map(tt => {
-              const temp = new Date(self.nowTime);
-              temp.setHours(...tt.split(":").map(f => Number(f)), 0, 0);
+          })
+          .sort((a, b) => a.getTime() - b.getTime());
+
+        const nextTime = dates.find((e) => e.getTime() > thresholdTime);
+        if (!nextTime)
+          throw new Error(
+            "Current date time is out of range of the trigger date time.",
+          );
+        o[k] = nextTime;
+      } else if (k === "everyDay" && v === true) {
+        const dates = setTimeValues
+          .map((tt) => {
+            const temp = new Date(this.nowTime);
+            const [hours, mins, secs = 0] = tt.split(":").map(Number);
+            temp.setHours(hours, mins, secs, 0);
+            return temp;
+          })
+          .sort((a, b) => a.getTime() - b.getTime());
+
+        let nextTime = dates.find((e) => e.getTime() > thresholdTime);
+
+        if (!nextTime) {
+          const nextDayDates = setTimeValues
+            .map((tt) => {
+              const temp = new Date(this.nowTime);
+              temp.setDate(temp.getDate() + 1);
+              const [hours, mins, secs = 0] = tt.split(":").map(Number);
+              temp.setHours(hours, mins, secs, 0);
               return temp;
-            }).sort((a, b) => new Date(a).getTime() > new Date(b).getTime() ? 1 : -1);
-            const t = dateObj.find(e => e.getTime() > (self.nowTime + self.ease));
-            if (!t) {
-              const dateObj = setTimeValues.map(tt => {
-                const temp = new Date(self.nowTime);
-                temp.setDate(temp.getDate() + 1);
-                temp.setHours(...tt.split(":").map(f => Number(f)), 0, 0);
-                return temp;
-              }).sort((a, b) => new Date(a).getTime() > new Date(b).getTime() ? 1 : -1);
-              const t = dateObj.find(e => e.getTime() > (self.nowTime + self.ease));
-              o[k] = t;
-            } else {
-              o[k] = t;
-            }
-          }
+            })
+            .sort((a, b) => a.getTime() - b.getTime());
+
+          nextTime = nextDayDates.find((e) => e.getTime() > thresholdTime);
         }
+        if (nextTime) o[k] = nextTime;
       }
+
       return o;
     }, {});
-    if (self.triggerOffset > 0) {
-      this.dateKeys.forEach(key => {
+
+    if (this.triggerOffset > 0) {
+      this.dateKeys.forEach((key) => {
         if (rawValues[key]) {
-          rawValues[key].setSeconds(self.triggerOffset);
+          rawValues[key].setTime(rawValues[key].getTime() + this.triggerOffset);
         }
       });
     }
+
     return rawValues;
   }
 }

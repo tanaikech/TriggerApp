@@ -75,11 +75,9 @@ I think that when the work function is only one, even with only one time-driven 
 In order to use this library, please install the library as follows.
 
 1. Create a GAS project.
-
    - You can use this library for the GAS project of both the standalone and container-bound script types.
 
 1. [Install this library](https://developers.google.com/apps-script/guides/libraries).
-
    - Library's project key is **`1LihDPPHWBCcadYVBI3oZ4vOt7XqlowoHyBLdaDgRIx_5OpRBREA7Z1QB`**.
 
 # Scopes
@@ -687,7 +685,7 @@ function sample(e) {
       };
       start = new Date(start.getTime() + 10 * 60 * 1000);
       return temp;
-    })
+    }),
   );
   const res = TriggerApp.setEventObject(e).installTriggers(obj, console.log);
   console.log(res);
@@ -847,6 +845,7 @@ function sample(e) {
 ```
 
 <a name="scenario8"></a>
+
 ## Scenario 8
 
 When you want to execute the function on the month-end, you can use the following sample script.
@@ -871,25 +870,82 @@ Here, please use `0` for the month-end. When this script is run at June 26, 2024
 
 ```json
 [
-  { "triggerTime": "2024-06-30T09:00:00Z", "executeFunction": "sampleFunction" },
-  { "triggerTime": "2024-07-15T09:00:00Z", "executeFunction": "sampleFunction" },
-  { "triggerTime": "2024-07-31T09:00:00Z", "executeFunction": "sampleFunction" },
-  { "triggerTime": "2024-08-15T09:00:00Z", "executeFunction": "sampleFunction" },
-  { "triggerTime": "2024-08-31T09:00:00Z", "executeFunction": "sampleFunction" },
-  { "triggerTime": "2024-09-15T09:00:00Z", "executeFunction": "sampleFunction" },
-  { "triggerTime": "2024-09-30T09:00:00Z", "executeFunction": "sampleFunction" },
-  { "triggerTime": "2024-10-15T09:00:00Z", "executeFunction": "sampleFunction" },
-  { "triggerTime": "2024-10-31T09:00:00Z", "executeFunction": "sampleFunction" },
-  { "triggerTime": "2024-11-15T09:00:00Z", "executeFunction": "sampleFunction" },
-  { "triggerTime": "2024-11-30T09:00:00Z", "executeFunction": "sampleFunction" },
-  { "triggerTime": "2024-12-15T09:00:00Z", "executeFunction": "sampleFunction" },
-  { "triggerTime": "2024-12-31T09:00:00Z", "executeFunction": "sampleFunction" },
-  { "triggerTime": "2025-01-15T09:00:00Z", "executeFunction": "sampleFunction" },
-  { "triggerTime": "2025-01-31T09:00:00Z", "executeFunction": "sampleFunction" },
-  { "triggerTime": "2025-02-15T09:00:00Z", "executeFunction": "sampleFunction" },
-  { "triggerTime": "2025-02-28T09:00:00Z", "executeFunction": "sampleFunction" },
-  { "triggerTime": "2025-03-15T09:00:00Z", "executeFunction": "sampleFunction" },
-  { "triggerTime": "2025-03-31T09:00:00Z", "executeFunction": "sampleFunction" },
+  {
+    "triggerTime": "2024-06-30T09:00:00Z",
+    "executeFunction": "sampleFunction"
+  },
+  {
+    "triggerTime": "2024-07-15T09:00:00Z",
+    "executeFunction": "sampleFunction"
+  },
+  {
+    "triggerTime": "2024-07-31T09:00:00Z",
+    "executeFunction": "sampleFunction"
+  },
+  {
+    "triggerTime": "2024-08-15T09:00:00Z",
+    "executeFunction": "sampleFunction"
+  },
+  {
+    "triggerTime": "2024-08-31T09:00:00Z",
+    "executeFunction": "sampleFunction"
+  },
+  {
+    "triggerTime": "2024-09-15T09:00:00Z",
+    "executeFunction": "sampleFunction"
+  },
+  {
+    "triggerTime": "2024-09-30T09:00:00Z",
+    "executeFunction": "sampleFunction"
+  },
+  {
+    "triggerTime": "2024-10-15T09:00:00Z",
+    "executeFunction": "sampleFunction"
+  },
+  {
+    "triggerTime": "2024-10-31T09:00:00Z",
+    "executeFunction": "sampleFunction"
+  },
+  {
+    "triggerTime": "2024-11-15T09:00:00Z",
+    "executeFunction": "sampleFunction"
+  },
+  {
+    "triggerTime": "2024-11-30T09:00:00Z",
+    "executeFunction": "sampleFunction"
+  },
+  {
+    "triggerTime": "2024-12-15T09:00:00Z",
+    "executeFunction": "sampleFunction"
+  },
+  {
+    "triggerTime": "2024-12-31T09:00:00Z",
+    "executeFunction": "sampleFunction"
+  },
+  {
+    "triggerTime": "2025-01-15T09:00:00Z",
+    "executeFunction": "sampleFunction"
+  },
+  {
+    "triggerTime": "2025-01-31T09:00:00Z",
+    "executeFunction": "sampleFunction"
+  },
+  {
+    "triggerTime": "2025-02-15T09:00:00Z",
+    "executeFunction": "sampleFunction"
+  },
+  {
+    "triggerTime": "2025-02-28T09:00:00Z",
+    "executeFunction": "sampleFunction"
+  },
+  {
+    "triggerTime": "2025-03-15T09:00:00Z",
+    "executeFunction": "sampleFunction"
+  },
+  {
+    "triggerTime": "2025-03-31T09:00:00Z",
+    "executeFunction": "sampleFunction"
+  },
   { "triggerTime": "2025-04-15T09:00:00Z", "executeFunction": "sampleFunction" }
 ]
 ```
@@ -910,7 +966,14 @@ function sample(e) {
   // const res = TriggerApp.setEventObject(e).installTriggers(obj, console.log);
 
   const res = TriggerApp.setEventObject(e).simulateTriggers(obj, console.log);
-  const str = res.map(({ triggerTime, executeFunction }) => ({ triggerTime: Utilities.formatDate(triggerTime, Session.getScriptTimeZone(), "yyyy-MM-dd'T'HH:mm:ss'Z'"), executeFunction }));
+  const str = res.map(({ triggerTime, executeFunction }) => ({
+    triggerTime: Utilities.formatDate(
+      triggerTime,
+      Session.getScriptTimeZone(),
+      "yyyy-MM-dd'T'HH:mm:ss'Z'",
+    ),
+    executeFunction,
+  }));
   console.log(JSON.stringify(str));
 }
 ```
@@ -949,29 +1012,31 @@ You can see it on [my Medium page](https://medium.com/google-cloud/easily-managi
 
   - When "wrappedSamples" is set as the time-driven trigger, 3 functions are run in order.
 
-
 ### Workarounds
+
 - In this library, when `toDay` is not set, the trigger cycle is repeated to infinity. But, when you confirm `message: '"sample" is not installed as the time-driven trigger. Because there is no the next trigger task.'` in the log, when you run `sample` (main function), please use the following workaround. In this workaround, `toDay` is set for every run from the execution date time. By this, the trigger cycle can be continued to be run.
 
-	```javascript
-	function sample(e) {
-	  const toDay = new Date();
-	  toDay.setMonth(toDay.getMonth() + 1);
-	  const obj = [
-	    {
-	      ownFunctionName: "sample",
-	      functionName: "sampleFunction",
-	      everyDay: true,
-	      atTimes: ["09:00:00"],
-	      toDay: toDay.toISOString()
-	    },
-	  ];
-	  const res = TriggerApp.setEventObject(e).setMaxOutputForSimulation(5).installTriggers(obj, console.log);
-	  console.log(res);
-	}
-	```
+  ```javascript
+  function sample(e) {
+    const toDay = new Date();
+    toDay.setMonth(toDay.getMonth() + 1);
+    const obj = [
+      {
+        ownFunctionName: "sample",
+        functionName: "sampleFunction",
+        everyDay: true,
+        atTimes: ["09:00:00"],
+        toDay: toDay.toISOString(),
+      },
+    ];
+    const res = TriggerApp.setEventObject(e)
+      .setMaxOutputForSimulation(5)
+      .installTriggers(obj, console.log);
+    console.log(res);
+  }
+  ```
 
-	- At V1.0.1, I think that this bug was removed.
+  - At V1.0.1, I think that this bug was removed.
 
 ---
 
@@ -993,25 +1058,26 @@ You can see it on [my Medium page](https://medium.com/google-cloud/easily-managi
 
 # Update History
 
-- v1.0.0 (July 16, 2023)
+- v2.0.0 (June 1, 2026)
+  1. Complete refactoring of the codebase using modern ES6+ features and optimized class object design.
+  2. Optimized internal array and date parsing loops for significantly better performance using Map/Reduce/Set protocols.
+  3. Strict adherence to backward compatibility with existing I/O specifications.
+  4. Corrected mathematical precision for `setTriggerOffsetTime` logical execution.
 
-  1. Initial release.
-
-- v1.0.1 (August 18, 2023)
-
-  1. When `toDay` is not used, there was a case that the next trigger is not installed. This bug was removed.
-
-- v1.0.2 (August 19, 2023)
-
-  1. When `toDay` is not used, there was a case that the next trigger is not installed. This bug was removed by efficient modification.
+- v1.0.4 (June 26, 2024)
+  1. Modified the calculation for increasing a month.
 
 - v1.0.3 (June 26, 2024)
-
   1. The calculation for increasing the month was modified.
   2. A new scenario 8 was added. In scenario 8, you can see how to use the month-end. [Ref](#scenario8)
 
-- v1.0.4 (June 26, 2024)
+- v1.0.2 (August 19, 2023)
+  1. When `toDay` is not used, there was a case that the next trigger is not installed. This bug was removed by efficient modification.
 
-  1. Modified the calculation for increasing a month.
+- v1.0.1 (August 18, 2023)
+  1. When `toDay` is not used, there was a case that the next trigger is not installed. This bug was removed.
+
+- v1.0.0 (July 16, 2023)
+  1. Initial release.
 
 [TOP](#top)

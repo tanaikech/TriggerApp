@@ -3,13 +3,20 @@
 <a name="top"></a>
 [MIT License](LICENCE)
 
+### ☕ Support this project
+
+_Currently, I have no consistent income. If you find this library useful in your business or daily tasks, your donation would make my life a little easier and heavily support the continuous maintenance of this project._<br>
+**[Donate via PayPal](https://tanaikech.github.io/donate/)**
+
 <a name="overview"></a>
 
 # Overview
 
 This is a Google Apps Script library for efficiently managing the time-driven triggers for executing Google Apps Script using Google Apps Script.
 
-![](images/fig1.png)
+**🔥 [NEW in v2.0.8+] MCP Autonomous Server Architecture:** TriggerApp can now operate entirely as a **Model Context Protocol (MCP) Server**. This allows Generative AI Agents to autonomously install, retrieve, simulate, and delete your Google Apps Script time-driven triggers through natural language prompts. It includes an embedded, completely isolated state-persistence mechanism, freeing AI agents from complex recursive handler definitions without compromising your project's security scope.
+
+![](images/fig1a.jpg)
 
 <a name="description"></a>
 
@@ -44,20 +51,65 @@ When this process is run, I thought that if only the next trigger time for the c
 
 In the above flow, this process can be achieved even with only 2 time-driven triggers. Actually, I tested this logic many times, and I could obtain that this can be used. This algorithm can achieve various triggers by installing only 2 time-driven triggers.
 
-I think that when the work function is only one, even with only one time-driven trigger, this process can be achieved. But, in my actual situation, I am required to use multiple work functions. So, in this case, I have given the specification for requiring 2 time-driven triggers.
+### 🧠 Deep Dive: The `mcpTriggerHandler` Architecture & Workflow
+
+Google Apps Script enforces strict quotas, typically limiting active project triggers to 20 per user/script. If you attempted to create hundreds of physical triggers for complex intervals, your project would immediately crash.
+
+TriggerApp bypasses this limitation using a **Daisy-Chain (Recursive Scheduling) Algorithm**. When utilizing TriggerApp—especially via the MCP Server or dedicated handler patterns—you will notice a function named **`mcpTriggerHandler`** constantly appearing in your active triggers list.
+
+#### **What is `mcpTriggerHandler`?**
+
+It is the heart of TriggerApp's infinite loop mechanics. It acts as the **Recursive Orchestrator**. Instead of registering infinite triggers, TriggerApp registers exactly **two physical triggers** at a time:
+
+1. One for your actual business logic function (`myTask`).
+2. One for the `mcpTriggerHandler` (scheduled slightly after your task).
+
+When `mcpTriggerHandler` fires, it autonomously reads your persisted configurations from `PropertiesService`, calculates the absolute next execution time mathematically, and reinstalls the next two triggers.
+
+**⚠️ CRITICAL WARNING:** Do NOT manually delete `mcpTriggerHandler` from your GAS Triggers dashboard. If you delete it, the recursive chain is broken, and your automated tasks will halt indefinitely after their next execution.
+
+#### **Architecture Flow Diagram**
+
+The following Mermaid sequence diagram visualizes exactly how user intents (via AI) are mapped through `mcpTriggerHandler` to bypass quotas safely:
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as User / AI Agent
+    participant MCP as MCP Server / Web App
+    participant TA as TriggerApp (Core)
+    participant Prop as PropertiesService
+    participant GAS as GAS Time-Driven Triggers
+    participant Task as Target Function (e.g., myTask)
+    participant Handler as mcpTriggerHandler
+
+    User->>MCP: Request: "Run myTask every day at 09:00"
+    MCP->>TA: mcp({ ... }) -> Calls install_triggers
+    TA->>Prop: Persists trigger configuration as JSON
+    TA->>GAS: Installs Trigger 1: myTask (Executes at 09:00)
+    TA->>GAS: Installs Trigger 2: mcpTriggerHandler (Executes at 09:01)
+
+    Note over GAS: ... Time passes until execution ...
+
+    GAS->>Task: Executes Trigger 1 (myTask)
+    Note right of Task: User's business logic runs
+
+    GAS->>Handler: Executes Trigger 2 (mcpTriggerHandler)
+    Handler->>TA: executeMcpTriggers(e, properties)
+    TA->>Prop: Reads persisted JSON configuration
+    TA->>TA: Calculates next scheduled execution time
+    TA->>GAS: Installs Next Trigger 1: myTask (Tomorrow 09:00)
+    TA->>GAS: Installs Next Trigger 2: mcpTriggerHandler (Tomorrow 09:01)
+    Note over TA, GAS: The infinite recursive loop is established
+```
 
 # Limitations
 
 - The time-driven trigger follows "Current limitations of Quotas for Google Services". [Ref](https://developers.google.com/apps-script/guides/services/quotas#current_limitations)
-
 - When `toDay` is not used, the trigger cycle is repeated to infinity. But., when an error occurs on the internal Google side for some reason, the trigger is stopped. At that time, please run the main function, again. By this, the trigger process is restarted.
-
 - In this library, I set the minimum interval between triggers as 60 seconds. Because, in the current stage, when the minimum interval time is less than 60 seconds, the time-driven trigger cannot be installed by the function executed by the time-driven trigger. I would like to believe that this situation might be resolved in the future update.
-
 - When I tested the time-driven triggers many times using this library, for example, even when the function is trying to execute at "00:00:00", at least, the script is run after "00:00:00" like "00:00:10". It seems that the function was not executed before "00:00:00". But, there were cases where the function is executed at "00:01:30". I guessed that the reason for this issue is due to the Google side. This might be also a limitation.
-
 - I'm not sure whether this has to be included in the "Limitations" section. When you want to execute functions using the "everyYear" property, I'm worried that when it occurs no execution of the script for a long time in the Google Apps Script project, it might be required to reauthorize the scopes. But, in the current stage, I have no experience with this issue. If you got it, please tell me. I believe that it will be useful for other users.
-
 - I believe that this library will be able to adapt to a lot of scenarios for using time-driven triggers. However, on the other hand, I think that this library cannot be used in all scenarios. Please be careful about this.
 
 # Library's project key
@@ -77,8 +129,114 @@ In order to use this library, please install the library as follows.
 1. Create a GAS project.
    - You can use this library for the GAS project of both the standalone and container-bound script types.
 
-1. [Install this library](https://developers.google.com/apps-script/guides/libraries).
+2. [Install this library](https://developers.google.com/apps-script/guides/libraries).
    - Library's project key is **`1LihDPPHWBCcadYVBI3oZ4vOt7XqlowoHyBLdaDgRIx_5OpRBREA7Z1QB`**.
+
+---
+
+## 2. Setup as an Autonomous MCP Server (Generative AI Integration)
+
+TriggerApp (v2.1+) bundles a native MCP Server with **State Persistence**. By deploying it as a Web App, you can empower AI Agents to interact with your Google Apps Script triggers intelligently. The AI doesn't need to understand complex daisy-chained triggers; it simply states what function to run and when.
+
+### Step-by-Step Deployment
+
+**Step 1: Write the client boilerplate code**  
+In your Google Apps Script project, paste the following required code block. This handles the MCP web route and defines the global `mcpTriggerHandler` for recursive autonomy. Notice that `PropertiesService.getScriptProperties()` is injected to ensure your configuration is saved locally to your script and not leaked.
+
+```javascript
+// Exposes the MCP server logic to incoming web requests
+const doPost = (e) => {
+  return TriggerApp.mcp({
+    e: e,
+    accessKey: "my_super_secret_key", // Security key for MCP access
+    log: true, // Set to true to automatically save raw request payloads and standard logs
+    spreadsheetId: "YOUR_SHEET_ID", // Required if log is true
+    lock: LockService.getScriptLock(),
+    properties: PropertiesService.getScriptProperties(), // MANDATORY: Preserves trigger scope isolation
+  });
+};
+
+// MANDATORY: Global handler enabling LLMs to build infinite triggers
+function mcpTriggerHandler(e) {
+  TriggerApp.executeMcpTriggers(e, PropertiesService.getScriptProperties());
+}
+
+// Add the functions you want the AI to trigger below:
+function myTask1() {
+  console.log("myTask1: Executed perfectly on schedule!");
+  // Optional: Append execution timestamp to your sheet to verify autonomous runs
+  // SpreadsheetApp.openById("YOUR_SHEET_ID").getSheetByName("test").appendRow([new Date(), "myTask1"]);
+}
+
+function myTask2() {
+  console.log("myTask2: Executed perfectly on schedule!");
+  // Optional: Append execution timestamp to your sheet to verify autonomous runs
+  // SpreadsheetApp.openById("YOUR_SHEET_ID").getSheetByName("test").appendRow([new Date(), "myTask2"]);
+}
+```
+
+**Step 2: Deploy as a Web App**
+
+1. Click the **Deploy** button at the top right of the GAS editor, then select **New deployment**.
+2. Click the gear icon and select **Web app**.
+3. Under **Execute as**, select **Me**.
+4. Under **Who has access**, select **Anyone**.
+5. Click **Deploy** and copy the generated **Web App URL**.
+
+> ⚠️ **Security Notice:** Because the Web App must be deployed with the "Anyone" setting for the external MCP client to reach it, it is openly exposed to the internet. **You must define a strong `accessKey`** in your script. Without the correct `accessKey` in the URL parameter, TriggerApp rejects all incoming unauthorized requests.
+
+**Step 3: Configure your MCP Client (e.g., Antigravity CLI)**  
+Pass the copied Web App URL to your MCP configuration file, making sure to append your `accessKey` as a URL query parameter.
+
+**`~/.gemini/antigravity/mcp_config.json`**
+
+```json
+{
+  "mcpServers": {
+    "set-trigge-test-project1": {
+      "serverUrl": "https://script.google.com/macros/s/{your_deployment_ID}/exec?accessKey=my_super_secret_key"
+    }
+  }
+}
+```
+
+Now, you can jump to the AI Prompts section below and start controlling your App Script natively using the exact functions (`myTask1`, `myTask2`) defined in your script.
+
+**The MCP server named `set-trigge-test-project1` manages time-driven triggers for a specific Google Apps Script project. Therefore, if you want to manage triggers across multiple Google Apps Script projects, you must deploy the MCP server as a Web App. This follows the specification at the Google side.**
+
+---
+
+### 🤖 Generative AI Prompts (MCP Integration)
+
+When connected as an MCP server, you can use these natural language prompts with your AI (like Claude or Gemini) to completely control TriggerApp without writing any code. The AI will utilize the mapped tools comprehensively based on the `myTask1` and `myTask2` functions provided in the sample script.
+
+**1. Getting Information (Get Triggers List)**
+
+> "Can you check and list all currently active time-driven triggers in my Google Apps Script project?"
+
+**2. Simulation & Installation (Simulate & Install Triggers)**
+
+> "Use the MCP server set-trigge-test-project1. I need to run the function `myTask1` every Monday, Wednesday, and Friday at 09:00 and 15:00. Please simulate this first to show me the exact times it will run this week. If the simulated timing looks correct to you, proceed to install the triggers."
+
+![sample prompt 1](images/fig3a.jpg)
+
+**3. Complex Intervals**
+
+> "Use the MCP server set-trigge-test-project1. Install a continuous trigger for `myTask2` that runs every 30 minutes from 10:00 to 18:00 on weekdays only."
+
+![sample prompt 2](images/fig3b.jpg)
+
+**4. Deleting Specific Triggers**
+
+> "Please delete the triggers associated with the function `myTask1`. Verify the deletion by checking the triggers list again."
+
+**5. Complete Purge (Delete All Triggers)**
+
+> "I want to start fresh. Purge and delete all active triggers completely."
+
+![sample prompt 3](images/fig3c.jpg)
+
+---
 
 # Scopes
 
@@ -102,7 +260,15 @@ This library uses the following 1 scope. This scope is used for installing the t
 | [installTriggersByData](#installtriggersbydata)         | This method installs the tasks given by data output from "simulateTriggers" method as the time-driven trigger.                                                                                                                                                                                                        |
 | [simulateTriggers](#simulatetriggers)                   | This method can simulate the time-driven triggers by inputting the actual object for the setTriggers method.                                                                                                                                                                                                          |
 |                                                         |                                                                                                                                                                                                                                                                                                                       |
-| [deleteAllTriggers](#deletealltriggers)                 | Delete all project triggers of the current Google Apps Script project. This method can be used independently from other methods.                                                                                                                                                                                      |
+| [getTriggers](#gettriggers)                             | Retrieves the list of all currently active time-driven triggers in the project. Output can be raw JSON or an LLM-optimized Markdown table.                                                                                                                                                                            |
+| [deleteTriggers](#deletetriggers)                       | Delete specific triggers targeted by their handler function names or their unique IDs. Syncs heavily with MCP configurations.                                                                                                                                                                                         |
+| [deleteAllTriggers](#deletealltriggers)                 | Delete all project triggers and completely wipe the state configurations.                                                                                                                                                                                                                                             |
+|                                                         |                                                                                                                                                                                                                                                                                                                       |
+| [mcp](#mcp)                                             | Deploys the built-in MCP Server mapping TriggerApp's tools to HTTP endpoints.                                                                                                                                                                                                                                         |
+| [executeMcpTriggers](#executemcptriggers)               | Retrieves persisted state rules mapped via the MCP Server and executes them securely inside the global generic handler.                                                                                                                                                                                               |
+| [showLogs](#showlogs)                                   | Inject a custom callback to pipe execution logs out to a real-time monitor or array.                                                                                                                                                                                                                                  |
+| [getLogs](#getlogs)                                     | Retrieves the complete history of execution logs for the current session.                                                                                                                                                                                                                                             |
+| [addCustomLog](#addcustomlog)                           | Inject your own strings and objects into the TriggerApp log stream.                                                                                                                                                                                                                                                   |
 
 <a name="seteventobject"></a>
 
@@ -422,17 +588,45 @@ function sample(e) {
 }
 ```
 
+<a name="gettriggers"></a>
+
+## getTriggers
+
+Retrieves the list of all active triggers in the project. Output can be raw JSON or formatted as an LLM-friendly Markdown table.
+
+```javascript
+// Retrieve as an Array
+const rawList = TriggerApp.getTriggers();
+
+// Retrieve as a Markdown table
+const mdList = TriggerApp.getTriggers({ markdown: true });
+console.log(mdList);
+```
+
+<a name="deletetriggers"></a>
+
+## deleteTriggers
+
+Destroys specific triggers using their linked handler function name or their exact unique IDs. When used via MCP or injected appropriately, configuration states are automatically cleared to prevent the triggers from resurrecting themselves.
+
+```javascript
+TriggerApp.deleteTriggers({
+  functionNames: ["sampleFunction", "oldTask"],
+  uniqueIds: ["12345678", "87654321"],
+});
+```
+
 <a name="deletealltriggers"></a>
 
 ## deleteAllTriggers
 
-Delete all project triggers of the current Google Apps Script project. This method can be used independently from other methods.
+Delete all project triggers of the current Google Apps Script project. This method can be used independently from other methods and natively purges all MCP states if `PropertiesService` is injected.
 
 The sample script is as follows.
 
 ```javascript
 function deleteAllTriggers() {
-  TriggerApp.deleteAllTriggers();
+  TriggerApp.deleteAllTriggers(PropertiesService.getScriptProperties());
 }
 ```
 
@@ -444,7 +638,7 @@ In this library, an object is used for executing the time-driven trigger. It's `
 
 1. `obj` is required to be an array including JSON object.
 2. The JSON object has the following 12 properties. In this library, the time-driven triggers for various situations can be achieved by combining these properties.
-   - ownFunctionName: string: Function name of the function for running `installTriggers` and `simulateTriggers`.
+   - ownFunctionName: string: Function name of the function for running `installTriggers` and `simulateTriggers`. _(Note: For MCP architecture, this is safely injected and obfuscated internally.)_
    - functionName: string: Function name of the function you want to run with the time-driven trigger.
    - everyDay: boolean: When this is true, the trigger is run every day.
    - everyWeek: string[]: When `["Monday", "Friday"]` is set, the trigger is run at "Monday" and "Friday" in every week.
@@ -978,6 +1172,73 @@ function sample(e) {
 }
 ```
 
+<a name="scenario9"></a>
+
+## Scenario 9 (Dedicated Recursive Handler Pattern)
+
+If you are not using the MCP Server architecture but still want a cleaner, separated codebase structure instead of monolithic functions (like `Scenario 1`), you can adopt the Dedicated Recursive Handler Pattern. This approach mimics the MCP architecture by separating the initial installation process from the recursive loop logic.
+
+```javascript
+// Step 1: Run this manually ONCE to kickstart the automated cycle
+function installMyAutomatedTriggers() {
+  const obj = [
+    {
+      ownFunctionName: "myRecursiveHandler", // Explicitly delegating the loop responsibility
+      functionName: "myBusinessLogicTask",
+      everyDay: true,
+      atTimes: ["08:30:00"],
+    },
+  ];
+  TriggerApp.installTriggers(obj, console.log);
+}
+
+// Step 2: This acts as your mcpTriggerHandler (The infinite orchestrator)
+function myRecursiveHandler(e) {
+  const obj = [
+    {
+      ownFunctionName: "myRecursiveHandler",
+      functionName: "myBusinessLogicTask",
+      everyDay: true,
+      atTimes: ["08:30:00"],
+    },
+  ];
+  // Re-evaluates and installs the NEXT scheduled execution times automatically
+  TriggerApp.setEventObject(e).installTriggers(obj);
+}
+
+// Step 3: Your actual business logic. Pure and isolated.
+function myBusinessLogicTask() {
+  console.log("Business logic is running natively and independently.");
+}
+```
+
+<a name="scenario10"></a>
+
+## Scenario 10
+
+When you only want to execute functions sequentially during specific office hours exclusively on weekdays (e.g., Every hour from 09:00 to 18:00, Monday through Friday).
+
+```javascript
+function sampleWeekdayOfficeHours(e) {
+  const obj = [
+    {
+      ownFunctionName: "sampleWeekdayOfficeHours",
+      functionName: "officeTask",
+      everyWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+      interval: 3600, // Executes every 3600 seconds (1 hour)
+      fromTime: "09:00",
+      toTime: "18:00",
+    },
+  ];
+  const res = TriggerApp.setEventObject(e).installTriggers(obj, console.log);
+  console.log(res);
+}
+
+function officeTask() {
+  console.log("Checking systems during weekday office hours...");
+}
+```
+
 ## Other samples
 
 You can see it on [my Medium page](https://medium.com/google-cloud/easily-managing-time-driven-triggers-using-google-apps-script-7fa48546b4e7).
@@ -1052,17 +1313,32 @@ You can see it on [my Medium page](https://medium.com/google-cloud/easily-managi
 
 [Tanaike](https://tanaikech.github.io/about/)
 
-[Donate](https://tanaikech.github.io/donate/)
+**[Donate](https://tanaikech.github.io/donate/)**
 
 <a name="updatehistory"></a>
 
 # Update History
 
+- v2.1.0 (June 2, 2026)
+  1. Internalized raw request logging mechanism (`raw` sheet auto-creation) directly into `TriggerApp.mcp()`, significantly simplifying client-side boilerplate.
+  2. Integrated deep architectural documentation and defensive logic detailing the critical recursion responsibilities of `mcpTriggerHandler` inside the `get_triggers_list` MCP output.
+  3. Consolidated and refactored the ultimate testing suite to fully validate programmatic trigger behaviors and MCP server routing alongside autonomous cleanup.
+
+- v2.0.8 (June 2, 2026)
+  1. Resolved critical property isolation scope failures in the MCP Server Architecture by implementing `PropertiesService` Dependency Injection (DI) directly from the client.
+  2. Ensures all persisted MCP trigger states are perfectly encapsulated within the user's script properties without bleeding across library environments.
+
+- v2.0.7 (June 2, 2026)
+  1. Integrated dynamic `PropertiesService` state persistence to preserve LLM configurations across daisy-chained executions.
+  2. Abstracted generic loop handlers away from LLMs for reliable zero-shot generation.
+
+- v2.0.6 (June 2, 2026)
+  1. Integrated advanced trigger deletion API (`deleteTriggers`) supporting precise targeting via function names or exact trigger `uniqueId`.
+  2. Implemented sophisticated AI-friendly Markdown reporting for all MCP server operations.
+
 - v2.0.0 (June 1, 2026)
   1. Complete refactoring of the codebase using modern ES6+ features and optimized class object design.
-  2. Optimized internal array and date parsing loops for significantly better performance using Map/Reduce/Set protocols.
-  3. Strict adherence to backward compatibility with existing I/O specifications.
-  4. Corrected mathematical precision for `setTriggerOffsetTime` logical execution.
+  2. Integrated `MCPApp` bundling, effectively turning TriggerApp into an autonomous **MCP Server**.
 
 - v1.0.4 (June 26, 2024)
   1. Modified the calculation for increasing a month.

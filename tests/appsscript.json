@@ -1,0 +1,19 @@
+{
+  "timeZone": "Asia/Tokyo",
+  "exceptionLogging": "STACKDRIVER",
+  "runtimeVersion": "V8",
+  "dependencies": {
+    "libraries": [
+      {
+        "userSymbol": "TriggerApp",
+        "version": "0",
+        "libraryId": "1BEkl61bualwEf_FRMw2iaUHUMPOcQEs0fvQBFPNfbHliq47xRmwP6QC8",
+        "developmentMode": true
+      }
+    ]
+  },
+  "webapp": {
+    "executeAs": "USER_DEPLOYING",
+    "access": "ANYONE_ANONYMOUS"
+  }
+}

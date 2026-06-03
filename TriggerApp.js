@@ -13,7 +13,7 @@ const appName = "TriggerApp";
  * @const {string}
  * @readonly
  */
-const version = "2.1.0";
+const version = "2.1.1";
 
 let appLogs = [];
 let appLogCallback = null;
@@ -311,6 +311,11 @@ function mcpSimulateTriggers_(args = {}) {
           : "N/A";
         mdText += `| ${r.executeFunction} | ${time} |\n`;
       });
+
+      // Inject raw JSON data optimized for chaining to install_triggers_by_data
+      mdText += `\n\n**Raw JSON Data (Optimized for \`install_triggers_by_data\`):**\n\`\`\`json\n`;
+      mdText += JSON.stringify({ data: result }, null, 2);
+      mdText += `\n\`\`\`\n`;
     } else {
       mdText += "No triggers were simulated for the given conditions.";
     }
@@ -433,6 +438,61 @@ function getDefaultMcpItems_() {
     },
   };
 
+  const triggersDataSchema = {
+    type: "array",
+    description: "Array of trigger configuration objects.",
+    items: {
+      type: "object",
+      properties: {
+        functionName: {
+          type: "string",
+          description: "The core work function to execute.",
+        },
+        atTimes: {
+          type: "array",
+          items: { type: "string" },
+          description: "Specific times e.g., ['09:00', '15:30'].",
+        },
+        everyDay: {
+          type: "boolean",
+          description: "Set true to repeat daily at atTimes.",
+        },
+        everyWeek: {
+          type: "array",
+          items: { type: "string" },
+          description: "Weekdays e.g., ['Monday'].",
+        },
+        everyMonth: {
+          type: "array",
+          items: { type: "number" },
+          description: "Days of month e.g., [1, 15].",
+        },
+        everyYear: {
+          type: "array",
+          items: { type: "string" },
+          description: "Specific dates e.g., ['2026-06-02'].",
+        },
+        interval: {
+          type: "number",
+          description: "Interval in seconds.",
+        },
+        fromTime: {
+          type: "string",
+          description: "Start time for continuous triggers e.g., '09:00'.",
+        },
+        toTime: {
+          type: "string",
+          description: "End time for continuous triggers e.g., '18:00'.",
+        },
+        toDay: {
+          type: "string",
+          description: "Limit trigger creation until this date (yyyy-mm-dd).",
+        },
+      },
+      required: ["functionName"],
+    },
+  };
+
   return [
     {
       type: "initialize",
@@ -458,7 +518,7 @@ function getDefaultMcpItems_() {
       value: {
         name: "delete_all_triggers",
         description:
-          "Purge and delete all time-driven triggers natively bound to the current Google Apps Script project. It also wipes the persisted state configurations.",
+          "Purge and delete all time-driven triggers natively bound to the current Google Apps Script project. It also wipes the persisted state configurations. IMPORTANT: After executing this tool, you MUST use the 'get_triggers_list' tool to verify the updated state of the triggers.",
         inputSchema: { type: "object", properties: {} },
       },
     },
@@ -468,7 +528,7 @@ function getDefaultMcpItems_() {
       value: {
         name: "delete_triggers",
         description:
-          "Delete specific time-driven triggers mapped to the current project by their function names or unique IDs.",
+          "Delete specific time-driven triggers mapped to the current project by their function names or unique IDs. IMPORTANT: After executing this tool, you MUST use the 'get_triggers_list' tool to verify the updated state of the triggers.",
         inputSchema: {
           type: "object",
           properties: {
@@ -493,68 +553,12 @@ function getDefaultMcpItems_() {
       value: {
         name: "install_triggers",
         description:
-          "Create and install new time-driven triggers using extensive TriggerApp parameters.",
+          "Create and install new time-driven triggers using extensive TriggerApp parameters. IMPORTANT: After executing this tool, you MUST use the 'get_triggers_list' tool to verify that the triggers were successfully installed.",
         inputSchema: {
           type: "object",
           properties: {
             ...commonProperties,
-            triggersData: {
-              type: "array",
-              description: "Array of trigger configuration objects.",
-              items: {
-                type: "object",
-                properties: {
-                  functionName: {
-                    type: "string",
-                    description: "The core work function to execute.",
-                  },
-                  atTimes: {
-                    type: "array",
-                    items: { type: "string" },
-                    description: "Specific times e.g., ['09:00', '15:30'].",
-                  },
-                  everyDay: {
-                    type: "boolean",
-                    description: "Set true to repeat daily at atTimes.",
-                  },
-                  everyWeek: {
-                    type: "array",
-                    items: { type: "string" },
-                    description: "Weekdays e.g., ['Monday'].",
-                  },
-                  everyMonth: {
-                    type: "array",
-                    items: { type: "number" },
-                    description: "Days of month e.g., [1, 15].",
-                  },
-                  everyYear: {
-                    type: "array",
-                    items: { type: "string" },
-                    description: "Specific dates e.g., ['2026-06-02'].",
-                  },
-                  interval: {
-                    type: "number",
-                    description: "Interval in seconds.",
-                  },
-                  fromTime: {
-                    type: "string",
-                    description:
-                      "Start time for continuous triggers e.g., '09:00'.",
-                  },
-                  toTime: {
-                    type: "string",
-                    description:
-                      "End time for continuous triggers e.g., '18:00'.",
-                  },
-                  toDay: {
-                    type: "string",
-                    description:
-                      "Limit trigger creation until this date (yyyy-mm-dd).",
-                  },
-                },
-                required: ["functionName"],
-              },
-            },
+            triggersData: triggersDataSchema,
           },
           required: ["triggersData"],
         },
@@ -571,11 +575,7 @@ function getDefaultMcpItems_() {
           type: "object",
           properties: {
             ...commonProperties,
-            triggersData: {
-              type: "array",
-              description:
-                "Array of trigger configuration objects identical to install_triggers schema.",
-            },
+            triggersData: triggersDataSchema,
           },
           required: ["triggersData"],
         },
@@ -587,7 +587,7 @@ function getDefaultMcpItems_() {
       value: {
         name: "install_triggers_by_data",
         description:
-          "Install triggers directly from simulated output data objects.",
+          "Install triggers directly from simulated output data objects. IMPORTANT: After executing this tool, you MUST use the 'get_triggers_list' tool to verify that the triggers were successfully installed.",
         inputSchema: {
           type: "object",
           properties: {

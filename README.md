@@ -1319,6 +1319,11 @@ You can see it on [my Medium page](https://medium.com/google-cloud/easily-managi
 
 # Update History
 
+- v2.1.1 (June 3, 2026)
+  1. Enhanced `mcpSimulateTriggers_` output to inject raw JSON data optimized for chaining directly into `install_triggers_by_data`.
+  2. Refactored MCP tool schemas to extract and reuse a common `triggersDataSchema`.
+  3. Updated description messages of key MCP tools (`delete_all_triggers`, `delete_triggers`, `install_triggers`, `install_triggers_by_data`) to explicitly guide agents to call `get_triggers_list` for verifying the updated state of triggers.
+
 - v2.1.0 (June 2, 2026)
   1. Internalized raw request logging mechanism (`raw` sheet auto-creation) directly into `TriggerApp.mcp()`, significantly simplifying client-side boilerplate.
   2. Integrated deep architectural documentation and defensive logic detailing the critical recursion responsibilities of `mcpTriggerHandler` inside the `get_triggers_list` MCP output.
